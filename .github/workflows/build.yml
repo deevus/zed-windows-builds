@@ -36,3 +36,37 @@ jobs:
         with:
           name: zed-release
           path: target/release
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: zed-release
+          path: zed-release
+
+      - name: Get the current date
+        id: date
+        run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: zed-${{ env.CURRENT_DATE }}
+          release_name: Zed (main) Nightly Build - ${{ env.CURRENT_DATE }}
+          draft: false
+          prerelease: true
+
+      - name: Upload release build artifact to GitHub Release
+        uses: actions/upload-release-asset@v3
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: zed-release
+          asset_name: zed-release.zip
+          asset_content_type: application/zip
