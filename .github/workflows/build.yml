@@ -1,0 +1,38 @@
+name: Build Zed Nightly
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs every night at midnight UTC
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: zed-industries/zed
+          ref: main
+
+      - name: Install rust nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          target: wasm32-wasi
+
+      - name: Build release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+      - name: Archive build
+        uses: actions/upload-artifact@v3
+        with:
+          name: zed-release
+          path: target/release
