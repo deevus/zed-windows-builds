@@ -58,7 +58,7 @@ jobs:
         run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Zip the release artifact
-        run: zip -r zed-${{ env.CURRENT_DATE }}.zip zed-release
+        run: zip -r zed-windows.zip zed-release/*
 
       - name: Upload release build artifact to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -67,4 +67,4 @@ jobs:
           tag_name: ${{ env.CURRENT_DATE }}
           draft: false
           make_latest: true
-          files: zed-${{ env.CURRENT_DATE }}.zip
+          files: zed-windows.zip
