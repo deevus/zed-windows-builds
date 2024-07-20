@@ -25,6 +25,9 @@ jobs:
           override: true
           target: wasm32-wasi
 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.7.3
+
       - name: Build release
         uses: actions-rs/cargo@v1
         with:
