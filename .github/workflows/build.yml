@@ -32,10 +32,10 @@ jobs:
           args: --release
 
       - name: Archive build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: zed-release
-          path: target/release
+          path: target/release/zed.exe
 
   release:
     needs: build
@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: zed-release
           path: zed-release
@@ -52,21 +52,15 @@ jobs:
         id: date
         run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: zed-${{ env.CURRENT_DATE }}
-          release_name: Zed (main) Nightly Build - ${{ env.CURRENT_DATE }}
-          draft: false
-          prerelease: true
+      - name: Zip the release artifact
+        run: zip -r zed-${{ env.CURRENT_DATE }}.zip zed-release
 
       - name: Upload release build artifact to GitHub Release
-        uses: actions/upload-release-asset@v3
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: zed-release
-          asset_name: zed-${{ env.CURRENT_DATE }}.zip
-          asset_content_type: application/zip
+          name: zed-${{ env.CURRENT_DATE }}
+          tag_name: ${{ env.CURRENT_DATE }}
+          prerelease: true
+          draft: false
+          make_latest: true
+          files: zed-${{ env.CURRENT_DATE }}.zip
