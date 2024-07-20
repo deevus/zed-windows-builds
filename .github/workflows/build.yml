@@ -63,9 +63,8 @@ jobs:
       - name: Upload release build artifact to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: zed-${{ env.CURRENT_DATE }}
+          name: ${{ env.CURRENT_DATE }}
           tag_name: ${{ env.CURRENT_DATE }}
-          prerelease: true
           draft: false
           make_latest: true
           files: zed-${{ env.CURRENT_DATE }}.zip
