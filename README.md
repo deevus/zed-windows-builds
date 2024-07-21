@@ -5,7 +5,8 @@
 Install using [Scoop](https://scoop.sh/)
 
 ```
-scoop install extras/zed-nightly
+scoop bucket add versions
+scoop install versions/zed-nightly
 ```
 
 ## Is it safe?
