@@ -19,10 +19,14 @@ jobs:
           repository: zed-industries/zed
           ref: main
 
+      - name: Check LongPathsEnabled
+        run: |
+           (Get-ItemProperty "HKLM:System\CurrentControlSet\Control\FileSystem").LongPathsEnabled
+
       - name: Install rust nightly
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
           override: true
           target: wasm32-wasi
 
