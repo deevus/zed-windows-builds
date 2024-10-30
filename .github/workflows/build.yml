@@ -19,20 +19,16 @@ jobs:
           ref: main
 
       - name: Install rust nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          target: wasm32-wasi
+        run: |
+          rustup toolchain install nightly
+          rustup default nightly
+          rustup target add wasm32-wasi
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.7.3
 
       - name: Build release
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
