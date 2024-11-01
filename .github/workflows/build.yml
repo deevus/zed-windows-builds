@@ -2,7 +2,7 @@ name: Build Zed Nightly
 
 on:
   schedule:
-    - cron: "0 1 * * *" # Runs every night at midnight UTC
+    - cron: "0 0 * * *" # Runs every night at midnight UTC
   push:
     branches:
       - main
