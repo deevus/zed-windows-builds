@@ -5,8 +5,8 @@
 Install using [Scoop](https://scoop.sh/)
 
 ```
-scoop bucket add versions
-scoop install versions/zed-nightly
+scoop bucket add vinhphm https://github.com/vinhphm/scoop-bucket
+scoop install vinhphm/zed-nightly
 ```
 
 ## Is it safe?
