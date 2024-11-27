@@ -39,7 +39,7 @@ jobs:
           ref: main
 
       - name: Install rust nightly
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
           override: true
@@ -51,12 +51,9 @@ jobs:
           key: ${{ matrix.backend }}
 
       - name: Build release
-        uses: actions-rs/cargo@v1
         env:
           RUSTFLAGS: ${{ matrix.rustflags }}
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
