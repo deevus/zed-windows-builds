@@ -10,6 +10,16 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        backend: [vulkan, opengl]
+        include:
+          - backend: vulkan
+            artifact_name: zed-release
+            rustflags: ""
+          - backend: opengl
+            artifact_name: zed-release-opengl
+            rustflags: "--cfg gles"
 
     steps:
       - name: Enable long paths in Git
@@ -29,7 +39,7 @@ jobs:
           ref: main
 
       - name: Install rust nightly
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
           override: true
@@ -37,17 +47,18 @@ jobs:
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.7.3
+        with:
+          key: ${{ matrix.backend }}
 
       - name: Build release
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        env:
+          RUSTFLAGS: ${{ matrix.rustflags }}
+        run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:
-          name: zed-release
+          name: ${{ matrix.artifact_name }}
           path: target/release/zed.exe
 
   release:
@@ -57,24 +68,30 @@ jobs:
       contents: write
 
     steps:
-      - name: Download release artifact
+      - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: zed-release
-          path: zed-release
+          path: artifacts
 
       - name: Get the current date
         id: date
         run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-      - name: Zip the release artifact
-        run: zip -r zed-windows.zip zed-release/*
+      - name: Create release directories and zip
+        run: |
+          mkdir -p zed-release zed-release-opengl
+          mv artifacts/zed-release/zed.exe zed-release/
+          mv artifacts/zed-release-opengl/zed.exe zed-release-opengl/
+          zip -r zed-windows.zip zed-release/*
+          zip -r zed-windows-opengl.zip zed-release-opengl/*
 
-      - name: Upload release build artifact to GitHub Release
+      - name: Upload release build artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ env.CURRENT_DATE }}
           tag_name: ${{ env.CURRENT_DATE }}
           draft: false
           make_latest: true
-          files: zed-windows.zip
+          files: |
+            zed-windows.zip
+            zed-windows-opengl.zip
