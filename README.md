@@ -1,5 +1,13 @@
 # Unofficial nightly builds of Zed for Windows
 
+**NOTE: This is not a support channel for Zed on Windows.**
+
+These builds are for those who want to live on the bleeding edge or just want to test Zed out on Windows. 
+
+Any issues with the Windows build should go through official channels, as this repository does not concern itself with the source code of Zed or issues found therein. 
+
+If you have suggestions for improvements to the build process, please start a discussion or make a PR. 
+
 ## Installation
 
 Install using [Scoop](https://scoop.sh/)
