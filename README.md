@@ -17,6 +17,12 @@ scoop bucket add versions
 scoop install versions/zed-nightly
 ```
 
+## Updates
+
+```
+scoop update zed-nightly
+```
+
 ## Is it safe?
 
 This repository is just a [simple GitHub workflow](./.github/workflows/build.yml) that builds Zed from `main` and publishes a release every night at UTC+0000. (Additionally on push for testing).
