@@ -52,10 +52,7 @@ jobs:
           key: ${{ matrix.backend }}
 
       - name: Setup rustflags
-        run: |
-          mkdir .cargo
-          echo "[target.'cfg(all())']" > .cargo/config.toml
-          echo 'rustflags = ["${{ matrix.rustflags }}"]' >> .cargo/config.toml
+        run: pwsh ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
       - name: Build release
         working-directory: zed
