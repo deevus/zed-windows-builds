@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir .cargo
           echo "[target.'cfg(all())']" > .cargo/config.toml
-          echo "rustflags = [\"${{ matrix.rustflags }}\"]" >> .cargo/config.toml
+          echo 'rustflags = ["${{ matrix.rustflags }}"]' >> .cargo/config.toml
 
       - name: Build release
         working-directory: zed
