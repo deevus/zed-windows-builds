@@ -3,9 +3,7 @@ name: Build Zed Nightly
 on:
   schedule:
     - cron: "0 0 * * *" # Runs every night at midnight UTC
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -37,6 +35,7 @@ jobs:
         with:
           repository: zed-industries/zed
           ref: main
+          path: zed
 
       - name: Install rust nightly
         uses: dtolnay/rust-toolchain@stable
@@ -50,20 +49,26 @@ jobs:
         with:
           key: ${{ matrix.backend }}
 
+      - name: Setup rustflags
+        run: |
+          mkdir .cargo
+          echo "[target.'cfg(all())']" > .cargo/config.toml
+          echo "rustflags = [\"${{ matrix.rustflags }}\"]" >> .cargo/config.toml
+
       - name: Build release
-        env:
-          RUSTFLAGS: ${{ matrix.rustflags }}
+        working-directory: zed
         run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: target/release/zed.exe
+          path: zed/target/release/zed.exe
 
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
 
