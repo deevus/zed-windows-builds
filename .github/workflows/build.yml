@@ -32,8 +32,11 @@ jobs:
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
             -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout self
+        uses: actions/checkout@v4
+
+      - name: Checkout Zed
+        uses: actions/checkout@v4
         with:
           repository: zed-industries/zed
           ref: main
