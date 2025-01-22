@@ -52,6 +52,7 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.backend }}
+          workspaces: "zed -> target"
 
       - name: Setup rustflags
         run: pwsh ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
