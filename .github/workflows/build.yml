@@ -3,9 +3,8 @@ name: Build Zed Nightly
 on:
   schedule:
     - cron: "0 0 * * *" # Runs every night at midnight UTC
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  pull_request:
 
 jobs:
   build:
@@ -32,11 +31,15 @@ jobs:
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
             -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout self
+        uses: actions/checkout@v4
+
+      - name: Checkout Zed
+        uses: actions/checkout@v4
         with:
           repository: zed-industries/zed
           ref: main
+          path: zed
 
       - name: Install rust nightly
         uses: dtolnay/rust-toolchain@stable
@@ -49,21 +52,25 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.backend }}
+          workspaces: "zed -> target"
+
+      - name: Setup rustflags
+        run: pwsh ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
       - name: Build release
-        env:
-          RUSTFLAGS: ${{ matrix.rustflags }}
+        working-directory: zed
         run: cargo build --release
 
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: target/release/zed.exe
+          path: zed/target/release/zed.exe
 
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
 
