@@ -1,4 +1,4 @@
 [target."cfg(all())"]
 rustflags = []
 [profile.release]
-debug = "False"
+debug = false
