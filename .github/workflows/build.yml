@@ -33,7 +33,7 @@ jobs:
 
       - name: Install PSToml module
         shell: pwsh
-        run: Install-Module -Name PSToml -Scope CurrentUser
+        run: Install-Module -Name PSToml -Scope CurrentUser -Force
 
       - name: Checkout self
         uses: actions/checkout@v4
