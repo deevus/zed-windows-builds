@@ -31,6 +31,10 @@ jobs:
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
             -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
 
+      - name: Install PSToml module
+        shell: pwsh
+        run: Install-Module -Name PSToml -Scope CurrentUser -Force
+
       - name: Checkout self
         uses: actions/checkout@v4
 
@@ -49,13 +53,14 @@ jobs:
           target: wasm32-wasip1
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.7.3
+        uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.backend }}
           workspaces: "zed -> target"
 
       - name: Setup rustflags
-        run: pwsh ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
+        shell: pwsh
+        run: ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
       - name: Build release
         working-directory: zed
