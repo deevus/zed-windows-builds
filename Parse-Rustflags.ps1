@@ -6,14 +6,6 @@ if ($rustflags.Length -eq 0) {
 }
 
 $config_path = ".cargo/config.toml"
-
-New-Item -Path $config_path -Force | Out-Null
-
-"[target.'cfg(all())']" | Out-File -FilePath $config_path -Append | Out-Null
-
-"rustflags = [" | Out-File -FilePath $config_path -Append -NoNewLine | Out-Null
-foreach ($flag in $rustflags) {
-	$line = """${flag}"", "
-	$line | Out-File -FilePath $config_path -Append -NoNewLine | Out-Null
-}
-"]" | Out-File -FilePath $config_path -Append | Out-Null
+$config = Get-Content $config_path | ConvertFrom-Toml
+$config.target.Item("cfg(all())").rustflags = $rustflags
+$config | ConvertTo-Toml -Depth 5 | Out-File $config_path
