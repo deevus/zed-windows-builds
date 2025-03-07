@@ -25,10 +25,6 @@ on:
         description: Branch/tag/ref to build
         type: string
         default: main
-      patch:
-        description: Apply someone120's (Yakira's) patch fixing LSP server discovery
-        type: boolean
-        default: true
 
 jobs:
   build:
@@ -62,10 +58,12 @@ jobs:
       - name: Checkout self
         uses: actions/checkout@v4
 
-      - name: Checkout Zed      
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh repo clone ${{ inputs.repository }} zed -- -b ${{ inputs.ref }}
+      - name: Checkout Zed
+        uses: actions/checkout@v4
+        with:
+          repository: {{ inputs.repository }}
+          ref: ${{ inputs.ref }}
+          path: zed
 
       - name: Install rust nightly
         uses: dtolnay/rust-toolchain@stable
