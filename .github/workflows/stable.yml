@@ -1,0 +1,67 @@
+name: Scheduled Stable Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  check_stable_releases:
+    name: Check for new stable release
+    runs-on: ubuntu-latest
+    outputs:
+      build_ref: ${{ steps.check.outputs.build_ref }}
+      release_tag: ${{ steps.check.outputs.release_tag }}
+      release_body: ${{ steps.check.outputs.release_body }}
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - name: Check releases
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get latest stable release data from the repository
+          UPSTREAM_RELEASE=$(gh api repos/zed-industries/zed/releases/latest --jq '{tag_name, body}')
+          UPSTREAM_TAG=$(echo "$UPSTREAM_RELEASE" | jq -r '.tag_name')
+          echo "Latest upstream release: $UPSTREAM_TAG"
+
+          # Get latest stable release tag from current repo
+          CURRENT_TAG=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name // "none"')
+          echo "Latest current repo release: $CURRENT_TAG"
+
+          # Set variables based on comparison
+          if [ "$UPSTREAM_TAG" != "$CURRENT_TAG" ]; then
+            echo "Building stable release from upstream tag: $UPSTREAM_TAG"
+            echo "build_ref=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
+            echo "release_tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
+            echo "should_build=true" >> $GITHUB_OUTPUT
+
+            # Copy over the release body from the repository
+            RELEASE_BODY=$(echo "$UPSTREAM_RELEASE" | jq -r '.body')
+            # Use delimiter syntax for multiline outputs
+            echo "release_body<<EOF" >> $GITHUB_OUTPUT
+            echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "No new stable release found, skipping build"
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          fi
+
+  trigger_build:
+    name: Build
+    needs: check_stable_releases
+    if: ${{ needs.check_stable_releases.outputs.should_build == 'true' }}
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ needs.check_stable_releases.outputs.build_ref }}
+
+  trigger_release:
+    name: Release
+    needs: [check_stable_releases, trigger_build]
+    uses: ./.github/workflows/release.yml
+    with:
+      is_prerelease: false
+      release_tag: ${{ needs.check_stable_releases.outputs.release_tag }}
+      release_body: ${{ needs.check_stable_releases.outputs.release_body }}
+    permissions:
+      contents: write
