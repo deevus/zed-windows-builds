@@ -11,10 +11,6 @@ on:
         description: Branch/tag/ref to build
         type: string
         required: true
-      patch:
-        description: Apply someone120's (Yakira's) patch fixing LSP server discovery
-        type: boolean
-        default: true
   workflow_dispatch:
     inputs:
       repository:
