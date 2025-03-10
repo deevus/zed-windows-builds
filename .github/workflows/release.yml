@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      is_prerelease:
+        description: Pre-release
+        type: boolean
+        required: true
+      release_tag:
+        description: Release tag
+        type: string
+        required: true
+      release_body:
+        description: Release description
+        type: string
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release directories and zip
+        run: |
+          mv artifacts/zed-release/zed.exe zed.exe
+          mv artifacts/zed-release-opengl/zed.exe zed-opengl.exe
+
+      - name: Upload release build artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ inputs.release_tag }}
+          tag_name: ${{ inputs.release_tag }}
+          body: ${{ inputs.release_body }}
+          draft: false
+          prerelease: ${{ inputs.is_prerelease }}
+          make_latest: true
+          files: |
+            zed.exe
+            zed-opengl.exe 

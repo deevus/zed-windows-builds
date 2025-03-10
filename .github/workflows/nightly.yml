@@ -1,0 +1,54 @@
+name: Scheduled Nightly Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  find_latest_commit:
+    name: Find latest commit
+    runs-on: ubuntu-latest
+    outputs:
+      build_ref: ${{ steps.check.outputs.build_ref }}
+      release_tag: ${{ steps.check.outputs.release_tag }}
+      release_body: ${{ steps.check.outputs.release_body }}
+    steps:
+      - name: Check releases
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Set repository and ref based on inputs
+          REPO="zed-industries/zed"
+          REF="main"
+          
+          # Get latest commit info
+          COMMIT=$(gh api repos/$REPO/commits/$REF --jq '{sha: .sha, message: .commit.message, html_url: .html_url}')
+          SHA=$(echo $COMMIT | jq -r '.sha' | cut -c1-8)
+          MSG=$(echo $COMMIT | jq -r '.message' | head -n 1)
+          URL=$(echo $COMMIT | jq -r '.html_url')
+          
+          echo "Building pre-release from $REPO#$SHA: $MSG"
+          echo "build_ref=$REF" >> $GITHUB_OUTPUT
+          echo "build_repo=$REPO" >> $GITHUB_OUTPUT
+          echo "release_tag=$(date +'%m-%d-%Y')" >> $GITHUB_OUTPUT
+          echo "release_body=Built from $REPO commit [$SHA]($URL): $MSG" >> $GITHUB_OUTPUT
+
+  trigger_build:
+    name: Build
+    needs: find_latest_commit
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ needs.find_latest_commit.outputs.build_ref }}
+
+  trigger_release:
+    name: Release
+    needs: [find_latest_commit, trigger_build]
+    uses: ./.github/workflows/release.yml
+    with:
+      is_prerelease: true
+      release_tag: ${{ needs.find_latest_commit.outputs.release_tag }}
+      release_body: ${{ needs.find_latest_commit.outputs.release_body }}
+    permissions:
+      contents: write
