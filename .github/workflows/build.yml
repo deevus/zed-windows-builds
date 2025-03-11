@@ -57,7 +57,7 @@ jobs:
       - name: Checkout Zed
         uses: actions/checkout@v4
         with:
-          repository: {{ inputs.repository }}
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.ref }}
           path: zed
 
@@ -86,4 +86,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: zed/target/release/zed.exe 
+          path: zed/target/release/zed.exe
