@@ -32,6 +32,9 @@ jobs:
         run: |
           mv artifacts/zed-release/zed.exe zed.exe
           mv artifacts/zed-release-opengl/zed.exe zed-opengl.exe
+          zip zed.zip -9 zed.exe
+          zip zed-opengl.zip -9 zed-opengl.exe
+          sha256sum zed.exe zed-opengl.exe zed.zip zed-opengl.zip > sha256sums.txt
 
       - name: Upload release build artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -44,4 +47,7 @@ jobs:
           make_latest: true
           files: |
             zed.exe
-            zed-opengl.exe 
+            zed-opengl.exe
+            zed.zip
+            zed-opengl.zip
+            sha256sums.txt
