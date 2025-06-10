@@ -37,7 +37,7 @@ jobs:
           sha256sum zed.exe zed-opengl.exe zed.zip zed-opengl.zip > sha256sums.txt
 
       - name: Upload release build artifacts to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.2.2
         with:
           name: ${{ inputs.release_tag }}
           tag_name: ${{ inputs.release_tag }}
