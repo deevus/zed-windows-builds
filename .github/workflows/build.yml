@@ -78,6 +78,33 @@ jobs:
         shell: pwsh
         run: ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
+      # ===== New step for modifying files =====
+      - name: Modify feature_flags.rs
+        shell: pwsh
+        working-directory: zed
+        run: |
+          $filePath = "crates/feature_flags/src/feature_flags.rs"
+          $originalContent = Get-Content -Path $filePath -Raw
+          
+          # Define the content to be replaced (preserve original indentation format)
+          $pattern = 'fn enabled_for_all\(\) -> bool \{\s+false\s+\}'
+          $replacement = 'fn enabled_for_all() -> bool {'
+          $replacement += "`n        true"
+          $replacement += "`n    }"
+          
+          # Perform the replacement
+          $modifiedContent = $originalContent -replace $pattern, $replacement
+          
+          # Verify if the modification was successful
+          if ($modifiedContent -eq $originalContent) {
+              Write-Error "Failed to modify $filePath - pattern not found!"
+              exit 1
+          }
+          
+          # Save the modified file
+          Set-Content -Path $filePath -Value $modifiedContent -NoNewline
+          Write-Host "Successfully modified $filePath"
+
       - name: Build release
         working-directory: zed
         run: cargo build --release
