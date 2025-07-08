@@ -37,10 +37,6 @@ jobs:
           echo "mock vulkan zed executable content" > artifacts/zed-release/zed.exe
           echo "mock opengl zed executable content" > artifacts/zed-release-opengl/zed.exe
 
-          # Make them executable-like (add some binary-like content)
-          dd if=/dev/zero bs=1024 count=10 >> artifacts/zed-release/zed.exe 2>/dev/null
-          dd if=/dev/zero bs=1024 count=10 >> artifacts/zed-release-opengl/zed.exe 2>/dev/null
-
           echo "Mock artifacts created:"
           ls -la artifacts/*/
 
