@@ -23,10 +23,24 @@ jobs:
       contents: write
 
     steps:
-      - name: Download release artifacts
+      - name: Download Vulkan artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: zed-release
+          path: artifacts/zed-release
+        continue-on-error: true
+
+      - name: Download OpenGL artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: zed-release-opengl
+          path: artifacts/zed-release-opengl
+        continue-on-error: true
+
+      - name: Debug - Show artifacts folder structure
+        run: |
+          echo "Artifacts folder structure:"
+          tree artifacts || find artifacts -type f -exec echo {} \; 2>/dev/null || echo "No artifacts folder found"
         continue-on-error: true
 
       - name: Checkout self (for scripts)
