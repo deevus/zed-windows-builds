@@ -2,42 +2,76 @@
 
 This directory contains helper scripts for the Zed Windows build process.
 
-## Scripts
+## Build Scripts
+
+### `Parse-Rustflags.ps1`
+
+PowerShell script that processes Rust compilation flags for the build process.
+
+**Purpose:**
+- Parses Rust flags passed as arguments
+- Sets up the build environment for different backends (Vulkan/OpenGL)
+- Configures conditional compilation flags in `.cargo/config.toml`
+
+**Usage:**
+```powershell
+./scripts/Parse-Rustflags.ps1 "--cfg gles"
+```
+
+**Requirements:**
+- PowerShell Core or Windows PowerShell
+- PSToml module (for TOML file manipulation)
+- Existing `.cargo/config.toml` file
+
+---
+
+## Release Scripts
 
 ### `prepare-release.sh`
 
-Main script that prepares release files from build artifacts. This script:
+Main script that prepares release files from build artifacts. Handles partial build failures gracefully.
 
-- Creates a `release/` directory
-- Moves Vulkan build (`zed.exe`) and creates zip if available
-- Moves OpenGL build (`zed-opengl.exe`) and creates zip if available
+**Features:**
+- Creates a `release/` directory for all output files
+- Processes Vulkan build (`zed.exe`) and creates zip if available
+- Processes OpenGL build (`zed-opengl.exe`) and creates zip if available
 - Generates SHA256 checksums for all release files
-- Fails if no build artifacts are found
+- Fails fast if no build artifacts are found
+- Uses wildcards for clean file handling
 
 **Usage:**
 ```bash
 ./scripts/prepare-release.sh
 ```
 
+**Input:**
+- `artifacts/zed-release/zed.exe` (Vulkan build)
+- `artifacts/zed-release-opengl/zed.exe` (OpenGL build)
+
+**Output:**
+- `release/zed.exe` and `release/zed.zip` (if Vulkan build exists)
+- `release/zed-opengl.exe` and `release/zed-opengl.zip` (if OpenGL build exists)
+- `release/sha256sums.txt` (checksums for all files)
+
 **Requirements:**
-- `artifacts/` directory with build outputs
 - `zip` command available
 - `sha256sum` command available
 
-**Output:**
-- `release/` directory containing all release files
-- Files may include: `zed.exe`, `zed.zip`, `zed-opengl.exe`, `zed-opengl.zip`, `sha256sums.txt`
+---
+
+## Test Scripts
 
 ### `test-prepare-release.sh`
 
-Comprehensive test suite for `prepare-release.sh`. Tests various scenarios:
+Comprehensive test suite for `prepare-release.sh` with full scenario coverage.
 
-- Both Vulkan and OpenGL builds present
-- Only Vulkan build present
-- Only OpenGL build present
-- No builds present (should fail)
-- Checksum validation
-- Zip file content verification
+**Test Scenarios:**
+- ✅ Both Vulkan and OpenGL builds present (5 files expected)
+- ✅ Only Vulkan build present (3 files expected)
+- ✅ Only OpenGL build present (3 files expected)
+- ❌ No builds present (should fail with clear error)
+- ✅ Checksum validation (verify SHA256 accuracy)
+- ✅ Zip file content verification
 
 **Usage:**
 ```bash
@@ -45,8 +79,9 @@ Comprehensive test suite for `prepare-release.sh`. Tests various scenarios:
 ```
 
 **Requirements:**
-- `prepare-release.sh` must be in the same directory
-- `unzip` command available for zip content verification
+- `prepare-release.sh` in the same directory
+- `unzip` command for zip content verification
+- Temporary directory support (`mktemp`)
 
 ## Testing
 

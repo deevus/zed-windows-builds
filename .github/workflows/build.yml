@@ -77,7 +77,7 @@ jobs:
 
       - name: Setup rustflags
         shell: pwsh
-        run: ./Parse-Rustflags.ps1 ${{ matrix.rustflags }}
+        run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
       - name: Build release
         working-directory: zed
