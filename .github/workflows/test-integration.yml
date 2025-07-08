@@ -1,0 +1,247 @@
+name: Test Integration
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/test-integration.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/test-integration.yml'
+  workflow_dispatch:
+
+jobs:
+  test-build-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create mock build artifacts
+        run: |
+          echo "Creating mock build artifacts to test integration..."
+
+          # Create artifacts directory structure like the real build would
+          mkdir -p artifacts/zed-release
+          mkdir -p artifacts/zed-release-opengl
+
+          # Create mock executables
+          echo "mock vulkan zed executable content" > artifacts/zed-release/zed.exe
+          echo "mock opengl zed executable content" > artifacts/zed-release-opengl/zed.exe
+
+          # Make them executable-like (add some binary-like content)
+          dd if=/dev/zero bs=1024 count=10 >> artifacts/zed-release/zed.exe 2>/dev/null
+          dd if=/dev/zero bs=1024 count=10 >> artifacts/zed-release-opengl/zed.exe 2>/dev/null
+
+          echo "Mock artifacts created:"
+          ls -la artifacts/*/
+
+      - name: Test release preparation script
+        run: |
+          chmod +x scripts/prepare-release.sh
+          ./scripts/prepare-release.sh
+
+          echo "Release files created:"
+          ls -la release/
+
+      - name: Upload mock artifacts (to test download step)
+        uses: actions/upload-artifact@v4
+        with:
+          name: zed-release
+          path: artifacts/zed-release/zed.exe
+
+      - name: Upload mock OpenGL artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zed-release-opengl
+          path: artifacts/zed-release-opengl/zed.exe
+
+  test-release-integration:
+    runs-on: ubuntu-latest
+    needs: test-build-integration
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download mock artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+        continue-on-error: true
+
+      - name: Verify downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find artifacts -type f -name "*.exe" -exec ls -la {} \;
+
+          if [ ! -f "artifacts/zed-release/zed.exe" ]; then
+            echo "❌ FAIL: Vulkan artifact not downloaded"
+            exit 1
+          fi
+
+          if [ ! -f "artifacts/zed-release-opengl/zed.exe" ]; then
+            echo "❌ FAIL: OpenGL artifact not downloaded"
+            exit 1
+          fi
+
+          echo "✅ All artifacts downloaded successfully"
+
+      - name: Test release preparation with downloaded artifacts
+        run: |
+          chmod +x scripts/prepare-release.sh
+          ./scripts/prepare-release.sh
+
+          echo "Release files after artifact download:"
+          ls -la release/
+
+      - name: Verify release files
+        run: |
+          # Check that all expected files exist
+          EXPECTED_FILES=("zed.exe" "zed.zip" "zed-opengl.exe" "zed-opengl.zip" "sha256sums.txt")
+
+          for file in "${EXPECTED_FILES[@]}"; do
+            if [ ! -f "release/$file" ]; then
+              echo "❌ FAIL: Missing expected file: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+
+          # Verify checksums
+          cd release
+          if ! sha256sum -c sha256sums.txt; then
+            echo "❌ FAIL: Checksum verification failed"
+            exit 1
+          fi
+
+          echo "✅ All checksums verified successfully"
+
+  test-partial-failure-scenarios:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        scenario:
+          - name: "vulkan-only"
+            create_vulkan: true
+            create_opengl: false
+            expected_files: 3
+          - name: "opengl-only"
+            create_vulkan: false
+            create_opengl: true
+            expected_files: 3
+          - name: "both-builds"
+            create_vulkan: true
+            create_opengl: true
+            expected_files: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create scenario-specific artifacts
+        run: |
+          echo "Testing scenario: ${{ matrix.scenario.name }}"
+
+          if [ "${{ matrix.scenario.create_vulkan }}" = "true" ]; then
+            echo "Creating Vulkan artifacts..."
+            mkdir -p artifacts/zed-release
+            echo "vulkan executable for ${{ matrix.scenario.name }}" > artifacts/zed-release/zed.exe
+          fi
+
+          if [ "${{ matrix.scenario.create_opengl }}" = "true" ]; then
+            echo "Creating OpenGL artifacts..."
+            mkdir -p artifacts/zed-release-opengl
+            echo "opengl executable for ${{ matrix.scenario.name }}" > artifacts/zed-release-opengl/zed.exe
+          fi
+
+          echo "Created artifacts:"
+          find artifacts -type f -name "*.exe" -exec ls -la {} \; || echo "No artifacts created"
+
+      - name: Test release preparation
+        run: |
+          chmod +x scripts/prepare-release.sh
+          ./scripts/prepare-release.sh
+
+          echo "Release files for scenario ${{ matrix.scenario.name }}:"
+          ls -la release/
+
+      - name: Verify expected file count
+        run: |
+          ACTUAL_COUNT=$(ls -1 release/ | wc -l)
+          EXPECTED_COUNT=${{ matrix.scenario.expected_files }}
+
+          if [ "$ACTUAL_COUNT" -ne "$EXPECTED_COUNT" ]; then
+            echo "❌ FAIL: Expected $EXPECTED_COUNT files, got $ACTUAL_COUNT"
+            echo "Files found:"
+            ls -la release/
+            exit 1
+          fi
+
+          echo "✅ Correct file count for scenario ${{ matrix.scenario.name }}: $EXPECTED_COUNT files"
+
+      - name: Verify checksums
+        run: |
+          cd release
+          if ! sha256sum -c sha256sums.txt; then
+            echo "❌ FAIL: Checksum verification failed for scenario ${{ matrix.scenario.name }}"
+            exit 1
+          fi
+
+          echo "✅ Checksums verified for scenario ${{ matrix.scenario.name }}"
+
+  test-no-artifacts-failure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test script fails with no artifacts
+        run: |
+          chmod +x scripts/prepare-release.sh
+
+          echo "Testing that script fails when no artifacts are present..."
+          if ./scripts/prepare-release.sh; then
+            echo "❌ FAIL: Script should have failed with no artifacts"
+            exit 1
+          else
+            echo "✅ Script correctly failed when no artifacts present"
+          fi
+
+  integration-summary:
+    runs-on: ubuntu-latest
+    needs: [test-build-integration, test-release-integration, test-partial-failure-scenarios, test-no-artifacts-failure]
+    if: always()
+
+    steps:
+      - name: Report test results
+        run: |
+          echo "🧪 Integration Test Summary:"
+          echo "=========================="
+          echo ""
+          echo "✅ Build Integration: ${{ needs.test-build-integration.result }}"
+          echo "✅ Release Integration: ${{ needs.test-release-integration.result }}"
+          echo "✅ Partial Failure Scenarios: ${{ needs.test-partial-failure-scenarios.result }}"
+          echo "✅ No Artifacts Failure: ${{ needs.test-no-artifacts-failure.result }}"
+          echo ""
+
+          if [ "${{ needs.test-build-integration.result }}" = "success" ] && \
+             [ "${{ needs.test-release-integration.result }}" = "success" ] && \
+             [ "${{ needs.test-partial-failure-scenarios.result }}" = "success" ] && \
+             [ "${{ needs.test-no-artifacts-failure.result }}" = "success" ]; then
+            echo "🎉 All integration tests passed!"
+            echo "The build and release workflows are properly integrated."
+          else
+            echo "❌ Some integration tests failed. Check the job logs above."
+            exit 1
+          fi

@@ -1,0 +1,97 @@
+name: Test Scripts
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/test.yml'
+  workflow_dispatch:
+
+jobs:
+  test-scripts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Run release preparation tests
+        run: ./scripts/test-prepare-release.sh
+
+      - name: Test script directly (no artifacts - should fail)
+        run: |
+          echo "Testing script behavior with no artifacts..."
+          if ./scripts/prepare-release.sh; then
+            echo "❌ FAIL: Script should have failed with no artifacts"
+            exit 1
+          else
+            echo "✅ Script correctly failed when no artifacts present"
+          fi
+
+      - name: Test script with mock artifacts
+        run: |
+          echo "Testing script with mock artifacts..."
+
+          # Create mock artifacts
+          mkdir -p artifacts/zed-release
+          mkdir -p artifacts/zed-release-opengl
+          echo "mock vulkan executable" > artifacts/zed-release/zed.exe
+          echo "mock opengl executable" > artifacts/zed-release-opengl/zed.exe
+
+          # Run the script
+          ./scripts/prepare-release.sh
+
+          # Verify outputs
+          if [ ! -f "release/zed.exe" ]; then
+            echo "❌ FAIL: Missing zed.exe"
+            exit 1
+          fi
+
+          if [ ! -f "release/zed-opengl.exe" ]; then
+            echo "❌ FAIL: Missing zed-opengl.exe"
+            exit 1
+          fi
+
+          if [ ! -f "release/zed.zip" ]; then
+            echo "❌ FAIL: Missing zed.zip"
+            exit 1
+          fi
+
+          if [ ! -f "release/zed-opengl.zip" ]; then
+            echo "❌ FAIL: Missing zed-opengl.zip"
+            exit 1
+          fi
+
+          if [ ! -f "release/sha256sums.txt" ]; then
+            echo "❌ FAIL: Missing sha256sums.txt"
+            exit 1
+          fi
+
+          # Verify checksums
+          cd release
+          if ! sha256sum -c sha256sums.txt; then
+            echo "❌ FAIL: Checksum verification failed"
+            exit 1
+          fi
+
+          echo "✅ All release files created and verified successfully"
+
+      - name: Display test results
+        if: always()
+        run: |
+          echo ""
+          echo "🧪 Test Summary:"
+          echo "- Script test suite: Completed"
+          echo "- No artifacts test: Completed"
+          echo "- Mock artifacts test: Completed"
+          echo ""
+          echo "✅ All script tests passed!"

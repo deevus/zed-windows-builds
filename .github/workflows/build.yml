@@ -35,6 +35,7 @@ jobs:
           - backend: opengl
             artifact_name: zed-release-opengl
             rustflags: "--cfg gles"
+      fail-fast: false
 
     steps:
       - name: Enable long paths in Git

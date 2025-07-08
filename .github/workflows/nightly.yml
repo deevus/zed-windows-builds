@@ -45,6 +45,7 @@ jobs:
   trigger_release:
     name: Release
     needs: [find_latest_commit, trigger_build]
+    if: always() && needs.find_latest_commit.result == 'success'
     uses: ./.github/workflows/release.yml
     with:
       is_prerelease: false
