@@ -19,7 +19,7 @@ on:
 
 jobs:
   test-build-integration:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -65,7 +65,7 @@ jobs:
           ls -la release/
 
   test-release-integration:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: test-build-integration
 
     steps:
@@ -127,7 +127,7 @@ jobs:
           echo "✅ All checksums verified successfully"
 
   test-partial-failure-scenarios:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     strategy:
       matrix:
@@ -201,7 +201,7 @@ jobs:
           echo "✅ Checksums verified for scenario ${{ matrix.scenario.name }}"
 
   test-no-artifacts-failure:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -220,7 +220,7 @@ jobs:
           fi
 
   integration-summary:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs:
       [
         test-build-integration,
