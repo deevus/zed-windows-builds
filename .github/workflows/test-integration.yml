@@ -38,7 +38,7 @@ jobs:
           echo "mock opengl zed executable content" > artifacts/zed-release-opengl/zed.exe
 
           echo "Mock artifacts created:"
-          ls -la artifacts/*/
+          Get-ChildItem -Path artifacts -Force | Format-List
 
       - name: Upload mock artifacts (to test download step)
         uses: actions/upload-artifact@v4
