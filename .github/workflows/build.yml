@@ -72,7 +72,7 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.backend }}
+          key: ${{ matrix.backend }}-${{ hashFiles('Cargo.lock') }}
           workspaces: "zed -> target"
 
       - name: Setup rustflags
