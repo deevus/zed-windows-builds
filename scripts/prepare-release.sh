@@ -15,14 +15,14 @@ mkdir -p "$RELEASE_DIR"
 if [ -f "$ARTIFACTS_DIR/zed-release/zed.exe" ]; then
     echo "Found Vulkan build, adding to release..."
     mv "$ARTIFACTS_DIR/zed-release/zed.exe" "$RELEASE_DIR/zed.exe"
-    zip "$RELEASE_DIR/zed.zip" -9 "$RELEASE_DIR/zed.exe"
+    zip -j "$RELEASE_DIR/zed.zip" -9 "$RELEASE_DIR/zed.exe"
 fi
 
 # Check if OpenGL build exists
 if [ -f "$ARTIFACTS_DIR/zed-release-opengl/zed.exe" ]; then
     echo "Found OpenGL build, adding to release..."
     mv "$ARTIFACTS_DIR/zed-release-opengl/zed.exe" "$RELEASE_DIR/zed-opengl.exe"
-    zip "$RELEASE_DIR/zed-opengl.zip" -9 "$RELEASE_DIR/zed-opengl.exe"
+    zip -j "$RELEASE_DIR/zed-opengl.zip" -9 "$RELEASE_DIR/zed-opengl.exe"
 fi
 
 # Generate checksums for existing files in release folder
