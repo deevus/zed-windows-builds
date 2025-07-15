@@ -15,6 +15,9 @@ jobs:
       release_body: ${{ steps.check.outputs.release_body }}
       should_build: ${{ steps.check.outputs.should_build }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Check releases
         id: check
         env:
