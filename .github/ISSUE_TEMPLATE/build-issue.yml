@@ -31,7 +31,7 @@ body:
       label: Build Type
       description: Which build are you using?
       options:
-        - Stable (Vulkan)
+        - Stable (DX12)
         - Stable (OpenGL)
         - Nightly (Vulkan)
         - Nightly (OpenGL)
