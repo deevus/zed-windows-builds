@@ -10,9 +10,7 @@ body:
 
         **This repository only handles issues related to the BUILD PROCESS and INSTALLATION of unofficial Windows builds.**
 
-        If you're experiencing issues with Zed itself (crashes, features, UI, performance, etc.), please report them through official channels:
-        - [Official Zed Issues](https://github.com/zed-industries/zed/issues)
-        - [Zed Discord](https://discord.gg/zed-community)
+        If you're experiencing issues with Zed itself (crashes, features, UI, performance, etc.), please report them to the [Official Zed Issues](https://github.com/zed-industries/zed/issues).
 
   - type: checkboxes
     id: checklist
