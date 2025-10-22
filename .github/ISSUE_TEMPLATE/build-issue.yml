@@ -107,6 +107,7 @@ body:
       description: Please provide relevant environment details
       placeholder: |
         - Windows Version: (e.g., Windows 11 23H2)
+        - Zed Version: (e.g., 0.123.0, or run `scoop info zed` to see installed version)
         - Installation Method: (e.g., scoop bucket + install command used)
     validations:
       required: true
