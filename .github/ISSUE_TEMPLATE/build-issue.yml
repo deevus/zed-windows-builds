@@ -1,0 +1,121 @@
+name: Build Issue Report
+description: Report an issue specifically related to the build process or installation of unofficial Windows builds
+title: "[Build Issue]: "
+labels: ["build"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before submitting an issue
+
+        **This repository only handles issues related to the BUILD PROCESS and INSTALLATION of unofficial Windows builds.**
+
+        If you're experiencing issues with Zed itself (crashes, features, UI, performance, etc.), please report them through official channels:
+        - [Official Zed Issues](https://github.com/zed-industries/zed/issues)
+        - [Zed Discord](https://discord.gg/zed-community)
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have read the [README](https://github.com/deevus/zed-windows-builds/blob/main/README.md) and understand this repository is only for build-related issues
+          required: true
+        - label: I have tested with the [official Windows builds](https://zed.dev/download) and confirmed this issue is specific to these unofficial builds
+          required: true
+        - label: This issue is related to the BUILD PROCESS, INSTALLATION, or PACKAGING (not Zed functionality)
+          required: true
+
+  - type: dropdown
+    id: build-type
+    attributes:
+      label: Build Type
+      description: Which build are you using?
+      options:
+        - Stable (Vulkan)
+        - Stable (OpenGL)
+        - Nightly (Vulkan)
+        - Nightly (OpenGL)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-category
+    attributes:
+      label: Issue Category
+      description: What type of build-related issue is this?
+      options:
+        - Installation/Scoop package issue
+        - Build artifact issue (missing files, corrupted download)
+        - Build process suggestion/improvement
+        - Documentation issue
+        - Other build-related
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe the build-related issue you're experiencing
+      placeholder: |
+        Please provide a clear description of the build/installation issue.
+
+        Examples of valid issues:
+        - "Scoop install fails with error X"
+        - "Downloaded build is missing file Y"
+        - "Installation instructions unclear for Z"
+
+        Examples of INVALID issues (should go to official Zed):
+        - "Zed crashes when I open a file"
+        - "Feature X doesn't work"
+        - "Extension Y has a bug"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this build/installation issue?
+      placeholder: |
+        1. Install using 'scoop install...'
+        2. Run command '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide relevant environment details
+      placeholder: |
+        - Windows Version: (e.g., Windows 11 23H2)
+        - Scoop Version: (run `scoop --version`)
+        - Installation Method: (e.g., scoop bucket + install command used)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or logs related to the build/installation issue
