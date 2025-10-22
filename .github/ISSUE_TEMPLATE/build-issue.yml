@@ -31,9 +31,9 @@ body:
       label: Build Type
       description: Which build are you using?
       options:
-        - Stable (DX12)
+        - Stable (DX11)
         - Stable (OpenGL)
-        - Nightly (DX12)
+        - Nightly (DX11)
         - Nightly (OpenGL)
     validations:
       required: true
