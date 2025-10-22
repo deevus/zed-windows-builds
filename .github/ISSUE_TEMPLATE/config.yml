@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Zed Official Issue Tracker
+    url: https://github.com/zed-industries/zed/issues
+    about: Report issues with Zed functionality, features, crashes, or bugs (NOT build-related issues)
+  - name: Official Zed Downloads
+    url: https://zed.dev/download
+    about: Download official Windows builds of Zed (recommended for most users)
