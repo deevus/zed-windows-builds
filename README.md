@@ -5,6 +5,11 @@
 [![Scheduled Nightly Build](https://github.com/deevus/zed-windows-builds/actions/workflows/nightly.yml/badge.svg)](https://github.com/deevus/zed-windows-builds/actions/workflows/nightly.yml)
 [![Scheduled Stable Build](https://github.com/deevus/zed-windows-builds/actions/workflows/stable.yml/badge.svg)](https://github.com/deevus/zed-windows-builds/actions/workflows/stable.yml)
 
+> [!NOTE]
+> **Official Windows builds are now available!** Download Zed for Windows from the official website: https://zed.dev/download
+>
+> This repository continues to provide unofficial community builds for those who want bleeding-edge nightly builds or prefer to use Scoop package manager.
+
 **NOTE: This is not a support channel for Zed on Windows.**
 
 These builds are for those who want to live on the bleeding edge or just want to test Zed out on Windows. 
