@@ -33,7 +33,7 @@ body:
       options:
         - Stable (DX12)
         - Stable (OpenGL)
-        - Nightly (Vulkan)
+        - Nightly (DX12)
         - Nightly (OpenGL)
     validations:
       required: true
