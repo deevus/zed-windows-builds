@@ -107,7 +107,6 @@ body:
       description: Please provide relevant environment details
       placeholder: |
         - Windows Version: (e.g., Windows 11 23H2)
-        - Scoop Version: (run `scoop --version`)
         - Installation Method: (e.g., scoop bucket + install command used)
     validations:
       required: true
