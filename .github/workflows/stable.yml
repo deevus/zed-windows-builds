@@ -36,7 +36,7 @@ jobs:
   trigger_release:
     name: Release
     needs: [check_stable_releases, trigger_build]
-    if: always() && needs.check_stable_releases.result == 'success'
+    if: always() && needs.check_stable_releases.result == 'success' && needs.check_stable_releases.outputs.should_build == 'true'
     uses: ./.github/workflows/release.yml
     with:
       is_prerelease: false
