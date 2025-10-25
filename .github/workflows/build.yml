@@ -23,20 +23,8 @@ on:
         default: main
 
 jobs:
-  build:
+  base-config:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        backend: [vulkan, opengl]
-        include:
-          - backend: vulkan
-            artifact_name: zed-release
-            rustflags: ""
-          - backend: opengl
-            artifact_name: zed-release-opengl
-            rustflags: "--cfg gles"
-      fail-fast: false
-
     steps:
       - name: Enable long paths in Git
         run: |
@@ -79,13 +67,41 @@ jobs:
         shell: pwsh
         run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
-      - name: Build release
+  build-cli:
+    needs: base-config
+    runs-on: windows-latest
+    steps:
+      - name: Build cli
+        working-directory: zed/crates/cli
+        run: cargo b -r
+
+      - name: Archive cli
+        uses: actions/upload-artifact@v4
+        with:
+          name: zed-cli
+          path: zed/target/release/cli.exe
+
+  build-editor:
+    needs: base-config
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        backend: [dx11, opengl]
+        include:
+          - backend: dx11
+            artifact_name: editor-release-dx11
+          - backend: opengl
+            artifact_name: editor-release-opengl
+      fail-fast: false
+
+    steps:
+      - name: Build editor
         working-directory: zed
         env:
           ZED_UPDATE_EXPLANATION: "Please use Scoop to update Zed."
-        run: cargo build --release
+        run: cargo b -r
 
-      - name: Archive build
+      - name: Archive editor
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
