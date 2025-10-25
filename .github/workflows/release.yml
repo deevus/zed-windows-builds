@@ -38,16 +38,16 @@ jobs:
           find artifacts -type f -name "*.exe" -exec ls -la {} \;
 
           # Check if CLI build exists
-          if [ ! -f "artifacts/zed-release/cli.exe" ]; then
-            echo "❌ FAIL: CLI artifact not found in Vulkan build"
+          if [ ! -f "artifacts/cli.exe" ]; then
+            echo "❌ FAIL: CLI artifact not found"
           fi
 
-          # Check if Vulkan build exists
-          if [ ! -f "artifacts/zed-release/zed.exe" ]; then
-            echo "❌ FAIL: Vulkan artifact not found"
+          # Check if Dx11 build exists
+          if [ ! -f "artifacts/editor-release-dx11/zed.exe" ]; then
+            echo "❌ FAIL: Dx11 artifact not found"
           fi
 
-          if [ ! -f "artifacts/zed-release-opengl/zed.exe" ]; then
+          if [ ! -f "artifacts/editor-release-opengl/zed.exe" ]; then
             echo "❌ FAIL: OpenGL artifact not found"
           fi
 
