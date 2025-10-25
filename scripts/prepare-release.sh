@@ -12,9 +12,9 @@ RELEASE_DIR="release"
 mkdir -p "$RELEASE_DIR"
 
 # Check if CLI build exists
-if [ -f "$ARTIFACTS_DIR/zed-release/cli.exe" ]; then
+if [ -f "$ARTIFACTS_DIR/cli.exe" ]; then
     echo "Found CLI build in Vulkan artifacts, adding to release..."
-    mv "$ARTIFACTS_DIR/zed-release/cli.exe" "$RELEASE_DIR/zed-cli.exe"
+    mv "$ARTIFACTS_DIR/cli.exe" "$RELEASE_DIR/zed-cli.exe"
     zip -j "$RELEASE_DIR/zed-cli.zip" -9 "$RELEASE_DIR/zed-cli.exe"
 fi
 
