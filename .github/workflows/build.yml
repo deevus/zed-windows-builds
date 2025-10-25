@@ -79,13 +79,23 @@ jobs:
         shell: pwsh
         run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
-      - name: Build release
+      - name: Build cli
+        working-directory: zed/crates/cli
+        run: cargo b -r
+
+      - name: Archive cli
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: zed/target/release/cli.exe
+
+      - name: Build editor
         working-directory: zed
         env:
           ZED_UPDATE_EXPLANATION: "Please use Scoop to update Zed."
-        run: cargo build --release
+        run: cargo b -r
 
-      - name: Archive build
+      - name: Archive editor
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}

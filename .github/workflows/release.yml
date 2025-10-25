@@ -37,6 +37,11 @@ jobs:
           echo "Downloaded artifacts:"
           find artifacts -type f -name "*.exe" -exec ls -la {} \;
 
+          # Check if CLI build exists
+          if [ ! -f "artifacts/zed-release/cli.exe" ]; then
+            echo "❌ FAIL: CLI artifact not found in Vulkan build"
+          fi
+
           # Check if Vulkan build exists
           if [ ! -f "artifacts/zed-release/zed.exe" ]; then
             echo "❌ FAIL: Vulkan artifact not found"
