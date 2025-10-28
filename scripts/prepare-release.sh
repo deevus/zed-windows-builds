@@ -18,11 +18,11 @@ if [ -f "$ARTIFACTS_DIR/cli.exe" ]; then
     zip -j "$RELEASE_DIR/zed-cli.zip" -9 "$RELEASE_DIR/cli.exe"
 fi
 
-# Check if Vulkan build exists
+# Check if DX11 build exists
 if [ -f "$ARTIFACTS_DIR/zed-release-dx11/zed.exe" ]; then
     echo "Found Vulkan build, adding to release..."
     mv "$ARTIFACTS_DIR/zed-release-dx11/zed.exe" "$RELEASE_DIR/zed.exe"
-    zip -j "$RELEASE_DIR/zed-dx11.zip" -9 "$RELEASE_DIR/zed.exe"
+    zip -j "$RELEASE_DIR/zed.zip" -9 "$RELEASE_DIR/zed.exe"
 fi
 
 # Check if OpenGL build exists
