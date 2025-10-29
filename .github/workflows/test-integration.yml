@@ -34,23 +34,24 @@ jobs:
           mkdir -p artifacts/zed-release-opengl
 
           # Create mock executables
-          echo "mock vulkan zed executable content" > artifacts/zed-release/zed.exe
-          echo "mock opengl zed executable content" > artifacts/zed-release-opengl/zed.exe
+          echo "mock vulkan zed executable content" > artifacts/cli-release/cli.exe
+          echo "mock vulkan zed executable content" > artifacts/editor-dx11-release/zed.exe
+          echo "mock opengl zed executable content" > artifacts/editor-opengl-release/zed.exe
 
           echo "Mock artifacts created:"
           Get-ChildItem -Path artifacts -Force | Format-List
 
-      - name: Upload mock artifacts (to test download step)
+      - name: Upload mock DX11 artifacts (to test download step)
         uses: actions/upload-artifact@v4
         with:
           name: zed-release
-          path: artifacts/zed-release/zed.exe
+          path: artifacts/editor-dx11-release/zed.exe
 
       - name: Upload mock OpenGL artifacts
         uses: actions/upload-artifact@v4
         with:
           name: zed-release-opengl
-          path: artifacts/zed-release-opengl/zed.exe
+          path: artifacts/editor-opengl-release/zed.exe
 
   test-release-integration:
     runs-on: ubuntu-latest
@@ -71,13 +72,20 @@ jobs:
           echo "Downloaded artifacts:"
           find artifacts -type f -name "*.exe" -exec ls -la {} \;
 
+          # Check if CLI build exists
+          if [ ! -f "artifacts/cli-release/cli.exe" ]; then
+            echo "❌ FAIL: CLI artifact not downloaded"
+            exit 1
+          fi
+
           # Check if Vulkan build exists
-          if [ ! -f "artifacts/zed-release/zed.exe" ]; then
+          if [ ! -f "artifacts/editor-dx11-release/zed.exe" ]; then
             echo "❌ FAIL: Vulkan artifact not downloaded"
             exit 1
           fi
 
-          if [ ! -f "artifacts/zed-release-opengl/zed.exe" ]; then
+          # Check if OpenGL build exists
+          if [ ! -f "artifacts/editor-opengl-release/zed.exe" ]; then
             echo "❌ FAIL: OpenGL artifact not downloaded"
             exit 1
           fi
@@ -95,7 +103,7 @@ jobs:
       - name: Verify release files
         run: |
           # Check that all expected files exist
-          EXPECTED_FILES=("zed.exe" "zed.zip" "zed-opengl.exe" "zed-opengl.zip" "sha256sums.txt")
+          EXPECTED_FILES=("cli.exe" "cli.zip" "zed.exe" "zed.zip" "zed-opengl.exe" "zed-opengl.zip" "sha256sums.txt")
 
           for file in "${EXPECTED_FILES[@]}"; do
             if [ ! -f "release/$file" ]; then
