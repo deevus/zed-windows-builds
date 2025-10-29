@@ -63,10 +63,6 @@ jobs:
           key: ${{ matrix.backend }}-${{ hashFiles('Cargo.lock') }}
           workspaces: "zed -> target"
 
-      - name: Setup rustflags
-        shell: pwsh
-        run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
-
   build-cli:
     needs: base-config
     runs-on: windows-latest
@@ -78,7 +74,7 @@ jobs:
       - name: Archive cli
         uses: actions/upload-artifact@v4
         with:
-          name: zed-cli
+          name: cli-release
           path: zed/target/release/cli.exe
 
   build-editor:
@@ -91,10 +87,15 @@ jobs:
           - backend: dx11
             artifact_name: editor-release-dx11
           - backend: opengl
+            rustflags: "--cfg gles"
             artifact_name: editor-release-opengl
       fail-fast: false
 
     steps:
+      - name: Setup rustflags
+        shell: pwsh
+        run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
+
       - name: Build editor
         working-directory: zed
         env:

@@ -76,7 +76,7 @@ create_opengl_artifact
 run_test "success"
 verify_file_count 7  # cli.exe cli.zip zed.exe, zed.zip, zed-opengl.exe, zed-opengl.zip, sha256sums.txt
 verify_file_exists "release/cli.exe"
-verify_file_exists "release/cli.zip"
+verify_file_exists "release/zed-cli.zip"
 verify_file_exists "release/zed.exe"
 verify_file_exists "release/zed.zip"
 verify_file_exists "release/zed-opengl.exe"

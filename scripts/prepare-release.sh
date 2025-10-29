@@ -12,15 +12,15 @@ RELEASE_DIR="release"
 mkdir -p "$RELEASE_DIR"
 
 # Check if CLI build exists
-if [ -f "$ARTIFACTS_DIR/cli.exe" ]; then
+if [ -f "$ARTIFACTS_DIR/cli-release/cli.exe" ]; then
     echo "Found CLI build, adding to release..."
-    mv "$ARTIFACTS_DIR/cli.exe" "$RELEASE_DIR/cli.exe"
+    mv "$ARTIFACTS_DIR/cli-release/cli.exe" "$RELEASE_DIR/cli.exe"
     zip -j "$RELEASE_DIR/zed-cli.zip" -9 "$RELEASE_DIR/cli.exe"
 fi
 
 # Check if DX11 build exists
 if [ -f "$ARTIFACTS_DIR/zed-release-dx11/zed.exe" ]; then
-    echo "Found Vulkan build, adding to release..."
+    echo "Found DX11 build, adding to release..."
     mv "$ARTIFACTS_DIR/zed-release-dx11/zed.exe" "$RELEASE_DIR/zed.exe"
     zip -j "$RELEASE_DIR/zed.zip" -9 "$RELEASE_DIR/zed.exe"
 fi
