@@ -20,14 +20,19 @@ setup_test() {
     mkdir -p artifacts
 }
 
-create_vulkan_artifact() {
-    mkdir -p artifacts/zed-release
-    echo "fake vulkan executable" > artifacts/zed-release/zed.exe
+create_dx11_artifact() {
+    mkdir -p artifacts/editor-dx11-release
+    echo "fake dx11 executable" > artifacts/editor-dx11-release/zed.exe
 }
 
 create_opengl_artifact() {
-    mkdir -p artifacts/zed-release-opengl
-    echo "fake opengl executable" > artifacts/zed-release-opengl/zed.exe
+    mkdir -p artifacts/editor-opengl-release
+    echo "fake opengl executable" > artifacts/editor-opengl-release/zed.exe
+}
+
+create_cli_artifact() {
+    mkdir -p artifacts/cli-release
+    echo "fake cli executable" > artifacts/cli-release/cli.exe
 }
 
 verify_file_exists() {
