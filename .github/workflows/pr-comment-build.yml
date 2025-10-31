@@ -19,9 +19,13 @@ jobs:
         id: check-command
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          # Match /build exactly (with optional whitespace or end of string)
-          if [[ "$COMMENT" =~ ^/build([[:space:]]|$) ]]; then
+          # Match /build with optional ref argument
+          # Examples: /build, /build main, /build v0.165.2, /build preview
+          if [[ "$COMMENT" =~ ^/build([[:space:]]+([^[:space:]]+))?([[:space:]]|$) ]]; then
             echo "command_found=true" >> $GITHUB_OUTPUT
+            # Extract ref argument (defaults to 'main' if not provided)
+            BUILD_REF="${BASH_REMATCH[2]:-main}"
+            echo "build_ref=$BUILD_REF" >> $GITHUB_OUTPUT
           else
             echo "command_found=false" >> $GITHUB_OUTPUT
           fi
@@ -118,14 +122,17 @@ jobs:
               // For same-repo PRs: Use PR's branch (allows testing workflow changes)
               const workflowRef = isFork ? pr.data.base.ref : pr.data.head.ref;
 
+              // Get the build ref from the command (e.g., /build main, /build v0.165.2)
+              const buildRef = '${{ steps.check-command.outputs.build_ref }}';
+
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build.yml',
                 ref: workflowRef,
                 inputs: {
-                  repository: headRepo,       // Fork or base repo
-                  ref: pr.data.head.sha       // SHA to build
+                  repository: 'zed-industries/zed',  // Always build official Zed
+                  ref: buildRef                       // Branch/tag from /build command
                 }
               });
 
@@ -141,12 +148,12 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `✅ Build triggered for PR #${context.issue.number}\n\n- Repository: \`${headRepo}\`\n- Branch: \`${pr.data.head.ref}\`\n- Commit: \`${pr.data.head.sha.substring(0, 7)}\`\n- Workflow: \`${workflowRef}\` ${isFork ? '(base branch - fork PR)' : '(PR branch - testing workflow changes)'}\n\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
+                body: `✅ Build triggered for PR #${context.issue.number}\n\n- Building: \`zed-industries/zed@${buildRef}\`\n- Workflow ref: \`${workflowRef}\` ${isFork ? '(base branch - fork PR)' : '(PR branch - testing workflow changes)'}\n\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
               });
 
               console.log(`Build triggered for PR #${context.issue.number}`);
-              console.log(`Repository: ${headRepo}`);
-              console.log(`Ref: ${pr.data.head.sha}`);
+              console.log(`Building: zed-industries/zed@${buildRef}`);
+              console.log(`Workflow ref: ${workflowRef}`);
             } catch (error) {
               // Error handling with user feedback
               await github.rest.reactions.createForIssueComment({
