@@ -15,7 +15,7 @@ jobs:
         id: check-command
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          if echo "$COMMENT" | grep -q "^/build"; then
+          if [[ "$COMMENT" =~ ^/build ]]; then
             echo "command_found=true" >> $GITHUB_OUTPUT
           else
             echo "command_found=false" >> $GITHUB_OUTPUT
@@ -54,6 +54,25 @@ jobs:
                 pull_number: context.issue.number
               });
 
+              // Check if PR is open
+              if (pr.data.state !== 'open') {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: `❌ Cannot trigger build: PR is ${pr.data.state}`
+                });
+
+                await github.rest.reactions.createForIssueComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: context.payload.comment.id,
+                  content: '-1'
+                });
+
+                return;
+              }
+
               // Check if building from a fork
               const baseRepo = `${context.repo.owner}/${context.repo.repo}`;
               const headRepo = pr.data.head.repo.full_name;
@@ -70,15 +89,16 @@ jobs:
               }
 
               // Trigger build workflow
-              // Note: Always pass base repository to workflow for checkout consistency
+              // Use SHA for ref (more reliable for forks than branch name)
+              // Use head repository so workflow can checkout the correct code
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build.yml',
-                ref: pr.data.head.ref,
+                ref: pr.data.head.sha,
                 inputs: {
-                  repository: baseRepo,
-                  ref: pr.data.head.ref
+                  repository: headRepo,
+                  ref: pr.data.head.sha
                 }
               });
 
@@ -94,12 +114,12 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `✅ Build triggered for PR #${context.issue.number}\n\nBranch: \`${pr.data.head.ref}\`\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
+                body: `✅ Build triggered for PR #${context.issue.number}\n\n- Repository: \`${headRepo}\`\n- Branch: \`${pr.data.head.ref}\`\n- Commit: \`${pr.data.head.sha.substring(0, 7)}\`\n\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
               });
 
               console.log(`Build triggered for PR #${context.issue.number}`);
-              console.log(`Repository: ${baseRepo}`);
-              console.log(`Ref: ${pr.data.head.ref}`);
+              console.log(`Repository: ${headRepo}`);
+              console.log(`Ref: ${pr.data.head.sha}`);
             } catch (error) {
               // Error handling with user feedback
               await github.rest.reactions.createForIssueComment({
@@ -113,7 +133,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `❌ Failed to trigger build: ${error.message}`
+                body: `❌ Failed to trigger build: ${error.message}\n\nCheck the [workflow logs](/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`
               });
 
               throw error;
