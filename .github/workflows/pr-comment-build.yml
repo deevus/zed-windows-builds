@@ -15,7 +15,7 @@ jobs:
         id: check-command
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          if echo "$COMMENT" | grep -q "^/build" || echo "$COMMENT" | grep -q "/build"; then
+          if echo "$COMMENT" | grep -q "^/build"; then
             echo "command_found=true" >> $GITHUB_OUTPUT
           else
             echo "command_found=false" >> $GITHUB_OUTPUT
@@ -38,25 +38,92 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            // Get PR details
-            const pr = await github.rest.pulls.get({
+            // Add reaction to acknowledge command
+            await github.rest.reactions.createForIssueComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
             });
 
-            // Trigger build workflow
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build.yml',
-              ref: pr.data.head.ref,
-              inputs: {
-                repository: pr.data.head.repo.full_name,
-                ref: pr.data.head.ref
+            try {
+              // Get PR details
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              });
+
+              // Security: Only build from base repository, not forks
+              const baseRepo = `${context.repo.owner}/${context.repo.repo}`;
+              const headRepo = pr.data.head.repo.full_name;
+
+              if (headRepo !== baseRepo) {
+                const errorMsg = `❌ Security: Cannot trigger builds for PRs from forks.\n\nHead repository: ${headRepo}\nBase repository: ${baseRepo}\n\nFor security reasons, builds from forks must be triggered manually by maintainers.`;
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: errorMsg
+                });
+
+                await github.rest.reactions.createForIssueComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: context.payload.comment.id,
+                  content: '-1'
+                });
+
+                core.setFailed('Cannot build from fork repository');
+                return;
               }
-            });
 
-            console.log(`Build triggered for PR #${context.issue.number}`);
-            console.log(`Repository: ${pr.data.head.repo.full_name}`);
-            console.log(`Ref: ${pr.data.head.ref}`);
+              // Trigger build workflow (using base repository to be explicit)
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'build.yml',
+                ref: pr.data.head.ref,
+                inputs: {
+                  repository: baseRepo,  // Always use base repository
+                  ref: pr.data.head.ref
+                }
+              });
+
+              // Success reaction
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'rocket'
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `✅ Build triggered for PR #${context.issue.number}\n\nBranch: \`${pr.data.head.ref}\`\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
+              });
+
+              console.log(`Build triggered for PR #${context.issue.number}`);
+              console.log(`Repository: ${baseRepo}`);
+              console.log(`Ref: ${pr.data.head.ref}`);
+            } catch (error) {
+              // Error handling with user feedback
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'confused'
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ Failed to trigger build: ${error.message}`
+              });
+
+              throw error;
+            }
