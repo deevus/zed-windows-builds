@@ -20,14 +20,19 @@ setup_test() {
     mkdir -p artifacts
 }
 
-create_vulkan_artifact() {
-    mkdir -p artifacts/zed-release
-    echo "fake vulkan executable" > artifacts/zed-release/zed.exe
+create_dx11_artifact() {
+    mkdir -p artifacts/editor-dx11-release
+    echo "fake dx11 executable" > artifacts/editor-dx11-release/zed.exe
 }
 
 create_opengl_artifact() {
-    mkdir -p artifacts/zed-release-opengl
-    echo "fake opengl executable" > artifacts/zed-release-opengl/zed.exe
+    mkdir -p artifacts/editor-opengl-release
+    echo "fake opengl executable" > artifacts/editor-opengl-release/zed.exe
+}
+
+create_cli_artifact() {
+    mkdir -p artifacts/cli-release
+    echo "fake cli executable" > artifacts/cli-release/cli.exe
 }
 
 verify_file_exists() {
@@ -69,21 +74,24 @@ run_test() {
     fi
 }
 
-# Test 1: Both Vulkan and OpenGL builds exist
-setup_test "Both builds exist"
-create_vulkan_artifact
+# Test 1: All three builds exist (CLI + DX11 + OpenGL)
+setup_test "All three builds exist"
+create_cli_artifact
+create_dx11_artifact
 create_opengl_artifact
 run_test "success"
-verify_file_count 5  # zed.exe, zed.zip, zed-opengl.exe, zed-opengl.zip, sha256sums.txt
+verify_file_count 7  # cli.exe, cli.zip, zed.exe, zed.zip, zed-opengl.exe, zed-opengl.zip, sha256sums.txt
+verify_file_exists "release/cli.exe"
+verify_file_exists "release/cli.zip"
 verify_file_exists "release/zed.exe"
 verify_file_exists "release/zed.zip"
 verify_file_exists "release/zed-opengl.exe"
 verify_file_exists "release/zed-opengl.zip"
 verify_file_exists "release/sha256sums.txt"
 
-# Test 2: Only Vulkan build exists
-setup_test "Only Vulkan build exists"
-create_vulkan_artifact
+# Test 2: Only DX11 build exists
+setup_test "Only DX11 build exists"
+create_dx11_artifact
 run_test "success"
 verify_file_count 3  # zed.exe, zed.zip, sha256sums.txt
 verify_file_exists "release/zed.exe"
@@ -99,6 +107,15 @@ verify_file_exists "release/zed-opengl.exe"
 verify_file_exists "release/zed-opengl.zip"
 verify_file_exists "release/sha256sums.txt"
 
+# Test 3.5: Only CLI build exists
+setup_test "Only CLI build exists"
+create_cli_artifact
+run_test "success"
+verify_file_count 3  # cli.exe, cli.zip, sha256sums.txt
+verify_file_exists "release/cli.exe"
+verify_file_exists "release/cli.zip"
+verify_file_exists "release/sha256sums.txt"
+
 # Test 4: No builds exist
 setup_test "No builds exist"
 run_test "failure"
@@ -112,7 +129,8 @@ echo "✅ No release files created when no builds exist"
 
 # Test 5: Verify checksums are correct
 setup_test "Checksum verification"
-create_vulkan_artifact
+create_cli_artifact
+create_dx11_artifact
 create_opengl_artifact
 run_test "success"
 
@@ -128,7 +146,7 @@ cd ..
 
 # Test 6: Verify zip files contain executables
 setup_test "Zip file content verification"
-create_vulkan_artifact
+create_dx11_artifact
 run_test "success"
 
 # Check zip content

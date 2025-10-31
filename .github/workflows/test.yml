@@ -42,17 +42,34 @@ jobs:
           echo "Testing script with mock artifacts..."
 
           # Create mock artifacts
-          mkdir -p artifacts/zed-release
-          mkdir -p artifacts/zed-release-opengl
-          echo "mock vulkan executable" > artifacts/zed-release/zed.exe
-          echo "mock opengl executable" > artifacts/zed-release-opengl/zed.exe
+          mkdir -p artifacts/cli-release
+          mkdir -p artifacts/editor-dx11-release
+          mkdir -p artifacts/editor-opengl-release
+          echo "mock cli executable" > artifacts/cli-release/cli.exe
+          echo "mock dx11 executable" > artifacts/editor-dx11-release/zed.exe
+          echo "mock opengl executable" > artifacts/editor-opengl-release/zed.exe
 
           # Run the script
           ./scripts/prepare-release.sh
 
           # Verify outputs
+          if [ ! -f "release/cli.exe" ]; then
+            echo "❌ FAIL: Missing cli.exe"
+            exit 1
+          fi
+
+          if [ ! -f "release/cli.zip" ]; then
+            echo "❌ FAIL: Missing cli.zip"
+            exit 1
+          fi
+
           if [ ! -f "release/zed.exe" ]; then
             echo "❌ FAIL: Missing zed.exe"
+            exit 1
+          fi
+
+          if [ ! -f "release/zed.zip" ]; then
+            echo "❌ FAIL: Missing zed.zip"
             exit 1
           fi
 
@@ -61,10 +78,6 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "release/zed.zip" ]; then
-            echo "❌ FAIL: Missing zed.zip"
-            exit 1
-          fi
 
           if [ ! -f "release/zed-opengl.zip" ]; then
             echo "❌ FAIL: Missing zed-opengl.zip"
