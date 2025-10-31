@@ -36,6 +36,26 @@ jobs:
             echo "has_permission=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Notify unauthorized user
+        if: steps.check-command.outputs.command_found == 'true' && steps.check-permissions.outputs.has_permission == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: '-1'
+            });
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '❌ You do not have permission to trigger builds. Only repository owners, members, and collaborators can use the `/build` command.'
+            });
+
       - name: Trigger build workflow
         if: steps.check-command.outputs.command_found == 'true' && steps.check-permissions.outputs.has_permission == 'true'
         uses: actions/github-script@v7
@@ -93,16 +113,16 @@ jobs:
               }
 
               // Trigger build workflow
-              // Use SHA for ref (more reliable for forks than branch name)
-              // Use head repository so workflow can checkout the correct code
+              // Note: 'ref' parameter specifies which workflow version to run (must exist in base repo)
+              // The PR code to build is passed via inputs.repository and inputs.ref
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build.yml',
-                ref: pr.data.head.sha,
+                ref: pr.data.base.ref,  // Base branch (where workflow exists)
                 inputs: {
-                  repository: headRepo,
-                  ref: pr.data.head.sha
+                  repository: headRepo,       // Fork or base repo
+                  ref: pr.data.head.sha       // SHA to build
                 }
               });
 
