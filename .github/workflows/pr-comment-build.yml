@@ -1,0 +1,62 @@
+name: PR Comment Build Trigger
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger-build:
+    # Only run on PR comments (not issues)
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check for /build command
+        id: check-command
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          if echo "$COMMENT" | grep -q "^/build" || echo "$COMMENT" | grep -q "/build"; then
+            echo "command_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "command_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check permissions
+        id: check-permissions
+        if: steps.check-command.outputs.command_found == 'true'
+        run: |
+          ASSOCIATION="${{ github.event.comment.author_association }}"
+          if [ "$ASSOCIATION" = "OWNER" ] || [ "$ASSOCIATION" = "MEMBER" ] || [ "$ASSOCIATION" = "COLLABORATOR" ]; then
+            echo "has_permission=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_permission=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger build workflow
+        if: steps.check-command.outputs.command_found == 'true' && steps.check-permissions.outputs.has_permission == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Get PR details
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Trigger build workflow
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build.yml',
+              ref: pr.data.head.ref,
+              inputs: {
+                repository: pr.data.head.repo.full_name,
+                ref: pr.data.head.ref
+              }
+            });
+
+            console.log(`Build triggered for PR #${context.issue.number}`);
+            console.log(`Repository: ${pr.data.head.repo.full_name}`);
+            console.log(`Ref: ${pr.data.head.ref}`);
