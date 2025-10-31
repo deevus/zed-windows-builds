@@ -9,6 +9,10 @@ jobs:
     # Only run on PR comments (not issues)
     if: github.event.issue.pull_request != null
     runs-on: ubuntu-latest
+    permissions:
+      issues: write        # Create comments
+      pull-requests: write # Add reactions to comments
+      actions: write       # Trigger workflow_dispatch
 
     steps:
       - name: Check for /build command
