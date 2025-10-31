@@ -19,7 +19,8 @@ jobs:
         id: check-command
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          if [[ "$COMMENT" =~ ^/build ]]; then
+          # Match /build exactly (with optional whitespace or end of string)
+          if [[ "$COMMENT" =~ ^/build([[:space:]]|$) ]]; then
             echo "command_found=true" >> $GITHUB_OUTPUT
           else
             echo "command_found=false" >> $GITHUB_OUTPUT
