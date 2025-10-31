@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to prepare release files from build artifacts
-# This script handles both Vulkan and OpenGL builds, creating releases even if one fails
+# This script handles CLI, DX11, and OpenGL builds, creating releases even if some fail
 
 set -euo pipefail
 

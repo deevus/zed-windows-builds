@@ -85,9 +85,9 @@ jobs:
             exit 1
           fi
 
-          # Check if Vulkan build exists
+          # Check if DX11 build exists
           if [ ! -f "artifacts/editor-dx11-release/zed.exe" ]; then
-            echo "❌ FAIL: Vulkan artifact not downloaded"
+            echo "❌ FAIL: DX11 artifact not downloaded"
             exit 1
           fi
 
@@ -136,19 +136,19 @@ jobs:
       matrix:
         scenario:
           - name: "cli-only"
-            create_vulkan: false
+            create_dx11: false
             create_opengl: false
             expected_files: 3
           - name: "dx11-only"
-            create_vulkan: true
+            create_dx11: true
             create_opengl: false
             expected_files: 5
           - name: "opengl-only"
-            create_vulkan: false
+            create_dx11: false
             create_opengl: true
             expected_files: 5
           - name: "both-builds"
-            create_vulkan: true
+            create_dx11: true
             create_opengl: true
             expected_files: 7
 
@@ -164,7 +164,7 @@ jobs:
           mkdir -p artifacts/cli-release
           echo "cli executable for ${{ matrix.scenario.name }}" > artifacts/cli-release/cli.exe
 
-          if [ "${{ matrix.scenario.create_vulkan }}" = "true" ]; then
+          if [ "${{ matrix.scenario.create_dx11 }}" = "true" ]; then
             echo "Creating DX11 artifacts..."
             mkdir -p artifacts/editor-dx11-release
             echo "dx11 executable for ${{ matrix.scenario.name }}" > artifacts/editor-dx11-release/zed.exe
