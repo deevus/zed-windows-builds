@@ -114,13 +114,15 @@ jobs:
               }
 
               // Trigger build workflow
-              // Note: 'ref' parameter specifies which workflow version to run (must exist in base repo)
-              // The PR code to build is passed via inputs.repository and inputs.ref
+              // For fork PRs: Use base branch workflow (PR's workflow doesn't exist in base repo)
+              // For same-repo PRs: Use PR's branch (allows testing workflow changes)
+              const workflowRef = isFork ? pr.data.base.ref : pr.data.head.ref;
+
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build.yml',
-                ref: pr.data.base.ref,  // Base branch (where workflow exists)
+                ref: workflowRef,
                 inputs: {
                   repository: headRepo,       // Fork or base repo
                   ref: pr.data.head.sha       // SHA to build
@@ -139,7 +141,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `✅ Build triggered for PR #${context.issue.number}\n\n- Repository: \`${headRepo}\`\n- Branch: \`${pr.data.head.ref}\`\n- Commit: \`${pr.data.head.sha.substring(0, 7)}\`\n\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
+                body: `✅ Build triggered for PR #${context.issue.number}\n\n- Repository: \`${headRepo}\`\n- Branch: \`${pr.data.head.ref}\`\n- Commit: \`${pr.data.head.sha.substring(0, 7)}\`\n- Workflow: \`${workflowRef}\` ${isFork ? '(base branch - fork PR)' : '(PR branch - testing workflow changes)'}\n\nCheck the [Actions tab](/${context.repo.owner}/${context.repo.repo}/actions) for progress.`
               });
 
               console.log(`Build triggered for PR #${context.issue.number}`);
