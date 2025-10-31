@@ -30,27 +30,34 @@ jobs:
           echo "Creating mock build artifacts to test integration..."
 
           # Create artifacts directory structure like the real build would
-          mkdir -p artifacts/zed-release
-          mkdir -p artifacts/zed-release-opengl
+          mkdir -p artifacts/cli-release
+          mkdir -p artifacts/editor-dx11-release
+          mkdir -p artifacts/editor-opengl-release
 
           # Create mock executables
-          echo "mock vulkan zed executable content" > artifacts/cli-release/cli.exe
-          echo "mock vulkan zed executable content" > artifacts/editor-dx11-release/zed.exe
-          echo "mock opengl zed executable content" > artifacts/editor-opengl-release/zed.exe
+          echo "mock cli executable content" > artifacts/cli-release/cli.exe
+          echo "mock dx11 executable content" > artifacts/editor-dx11-release/zed.exe
+          echo "mock opengl executable content" > artifacts/editor-opengl-release/zed.exe
 
           echo "Mock artifacts created:"
           Get-ChildItem -Path artifacts -Force | Format-List
 
+      - name: Upload mock CLI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-release
+          path: artifacts/cli-release/cli.exe
+
       - name: Upload mock DX11 artifacts (to test download step)
         uses: actions/upload-artifact@v4
         with:
-          name: zed-release
+          name: editor-dx11-release
           path: artifacts/editor-dx11-release/zed.exe
 
       - name: Upload mock OpenGL artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: zed-release-opengl
+          name: editor-opengl-release
           path: artifacts/editor-opengl-release/zed.exe
 
   test-release-integration:
@@ -132,18 +139,18 @@ jobs:
             create_vulkan: false
             create_opengl: false
             expected_files: 3
-          - name: "vulkan-only"
+          - name: "dx11-only"
             create_vulkan: true
             create_opengl: false
-            expected_files: 3
+            expected_files: 5
           - name: "opengl-only"
             create_vulkan: false
             create_opengl: true
-            expected_files: 3
+            expected_files: 5
           - name: "both-builds"
             create_vulkan: true
             create_opengl: true
-            expected_files: 5
+            expected_files: 7
 
     steps:
       - name: Checkout repository
@@ -153,16 +160,20 @@ jobs:
         run: |
           echo "Testing scenario: ${{ matrix.scenario.name }}"
 
+          # Always create CLI artifacts for these scenarios
+          mkdir -p artifacts/cli-release
+          echo "cli executable for ${{ matrix.scenario.name }}" > artifacts/cli-release/cli.exe
+
           if [ "${{ matrix.scenario.create_vulkan }}" = "true" ]; then
-            echo "Creating Vulkan artifacts..."
-            mkdir -p artifacts/zed-release
-            echo "vulkan executable for ${{ matrix.scenario.name }}" > artifacts/zed-release/zed.exe
+            echo "Creating DX11 artifacts..."
+            mkdir -p artifacts/editor-dx11-release
+            echo "dx11 executable for ${{ matrix.scenario.name }}" > artifacts/editor-dx11-release/zed.exe
           fi
 
           if [ "${{ matrix.scenario.create_opengl }}" = "true" ]; then
             echo "Creating OpenGL artifacts..."
-            mkdir -p artifacts/zed-release-opengl
-            echo "opengl executable for ${{ matrix.scenario.name }}" > artifacts/zed-release-opengl/zed.exe
+            mkdir -p artifacts/editor-opengl-release
+            echo "opengl executable for ${{ matrix.scenario.name }}" > artifacts/editor-opengl-release/zed.exe
           fi
 
           echo "Created artifacts:"
