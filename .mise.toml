@@ -1,0 +1,4 @@
+[tools]
+gh = "latest"
+act = "latest"
+shellcheck = "latest"
