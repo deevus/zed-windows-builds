@@ -54,39 +54,30 @@ jobs:
                 pull_number: context.issue.number
               });
 
-              // Security: Only build from base repository, not forks
+              // Check if building from a fork
               const baseRepo = `${context.repo.owner}/${context.repo.repo}`;
               const headRepo = pr.data.head.repo.full_name;
+              const isFork = headRepo !== baseRepo;
 
-              if (headRepo !== baseRepo) {
-                const errorMsg = `❌ Security: Cannot trigger builds for PRs from forks.\n\nHead repository: ${headRepo}\nBase repository: ${baseRepo}\n\nFor security reasons, builds from forks must be triggered manually by maintainers.`;
-
+              // Warn maintainer if building from fork (but allow it)
+              if (isFork) {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: context.issue.number,
-                  body: errorMsg
+                  body: `⚠️ **Security Notice**: Building from fork repository\n\n- Fork: \`${headRepo}\`\n- Base: \`${baseRepo}\`\n\nEnsure you've reviewed the code changes before proceeding. The build will run with repository permissions.`
                 });
-
-                await github.rest.reactions.createForIssueComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: context.payload.comment.id,
-                  content: '-1'
-                });
-
-                core.setFailed('Cannot build from fork repository');
-                return;
               }
 
-              // Trigger build workflow (using base repository to be explicit)
+              // Trigger build workflow
+              // Note: Always pass base repository to workflow for checkout consistency
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build.yml',
                 ref: pr.data.head.ref,
                 inputs: {
-                  repository: baseRepo,  // Always use base repository
+                  repository: baseRepo,
                   ref: pr.data.head.ref
                 }
               });
