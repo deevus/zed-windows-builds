@@ -79,6 +79,10 @@ jobs:
           key: ${{ matrix.name }}-${{ hashFiles('**/Cargo.lock') }}
           workspaces: "zed -> target"
 
+      - name: Install PSToml module
+        shell: pwsh
+        run: Install-Module -Name PSToml -Scope CurrentUser -Force
+
       - name: Setup rustflags
         shell: pwsh
         run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
