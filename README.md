@@ -34,7 +34,7 @@ scoop bucket add versions
 scoop install versions/zed-nightly
 ```
 
-## Vulkan doesn't work for you?
+## DX11 doesn't work for you?
 
 Install the OpenGL version
 
@@ -84,7 +84,7 @@ See the [Zed homepage](https://zed.dev/) or [official repository](https://github
 
 The build process is designed to be robust and handle partial failures gracefully:
 
-- **Resilient Builds**: If one build variant (Vulkan or OpenGL) fails, the other will still complete and create a release
+- **Resilient Builds**: If one build variant (DX11 or OpenGL) fails, the other will still complete and create a release
 - **Comprehensive Testing**: All build scripts are thoroughly tested with automated test suites
 - **Quality Assurance**: Each release includes SHA256 checksums for integrity verification
 
