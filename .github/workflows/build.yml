@@ -24,9 +24,9 @@ on:
 
 jobs:
   build:
-    runs-on: windows-11-arm
     strategy:
       matrix:
+        os: [windows-11-arm, windows-latest]
         include:
           - name: cli
             build_path: crates/cli
@@ -44,6 +44,8 @@ jobs:
             artifact: editor-opengl-release
             binary: zed.exe
             rustflags: "--cfg gles"
+
+      runs-on: ${{ matrix.os }}
       fail-fast: false
 
     steps:
