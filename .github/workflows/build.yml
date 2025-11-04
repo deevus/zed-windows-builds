@@ -44,9 +44,8 @@ jobs:
             artifact: editor-opengl-release
             binary: zed.exe
             rustflags: "--cfg gles"
-
-      runs-on: ${{ matrix.os }}
       fail-fast: false
+    runs-on: windows-11-arm
 
     steps:
       - name: Enable long paths in Git
