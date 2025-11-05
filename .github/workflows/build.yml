@@ -45,7 +45,7 @@ jobs:
             binary: zed.exe
             rustflags: "--cfg gles"
       fail-fast: false
-    runs-on: windows-11-arm
+    runs-on: {{ matrix.os }}
 
     steps:
       - name: Enable long paths in Git
