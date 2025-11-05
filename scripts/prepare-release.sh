@@ -15,7 +15,6 @@ mkdir -p "$RELEASE_DIR"
 if [ -f "$ARTIFACTS_DIR/cli-release/cli.exe" ]; then
     echo "Found CLI build, adding to release..."
     mv "$ARTIFACTS_DIR/cli-release/cli.exe" "$ARTIFACTS_DIR/cli-release/zed.exe"
-    # zip -j "$RELEASE_DIR/cli.zip" -9 "$RELEASE_DIR/cli.exe"
 fi
 
 # Check if DX11 build exists

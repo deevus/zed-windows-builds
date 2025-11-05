@@ -80,7 +80,7 @@ create_cli_artifact
 create_dx11_artifact
 create_opengl_artifact
 run_test "success"
-verify_file_count 8  # cli.exe, cli.zip, zed.exe, zed.zip, zed-opengl.exe, zed-opengl.zip, sha256sums.txt
+verify_file_count 8
 verify_file_exists "release/cli-release/zed.exe"
 verify_file_exists "release/editor-dx11-release/bin/zed.exe"
 verify_file_exists "release/editor-opengl-release/bin/zed.exe"
