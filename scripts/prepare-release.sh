@@ -14,7 +14,10 @@ mkdir -p "$RELEASE_DIR"
 # Check if CLI build exists
 if [ -f "$ARTIFACTS_DIR/cli-release/cli.exe" ]; then
     echo "Found CLI build, adding to release..."
-    mv "$ARTIFACTS_DIR/cli-release/cli.exe" "$ARTIFACTS_DIR/cli-release/zed.exe"
+
+    cd "$ARTIFACTS_DIR/cli-release"
+    mv cli.exe zed.exe
+    cd - > /dev/null
 fi
 
 # Check if DX11 build exists
@@ -24,7 +27,10 @@ if [ -f "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" ]; then
     mkdir -p "$ARTIFACTS_DIR/editor-dx11-release/zed/bin"
     mv "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed/bin"
-    zip -j "$RELEASE_DIR/zed.zip" -9 "$ARTIFACTS_DIR/editor-dx11-release/zed"
+
+    cd "$ARTIFACTS_DIR/editor-dx11-release"
+    zip -r "$RELEASE_DIR/zed.zip" -9 zed
+    cd - > /dev/null
 fi
 
 # Check if OpenGL build exists
@@ -34,7 +40,11 @@ if [ -f "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" ]; then
     mkdir -p "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
     mv "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
-    zip -j "$RELEASE_DIR/zed-opengl.zip" -9 "$ARTIFACTS_DIR/editor-opengl-release/zed"
+
+    cd "$ARTIFACTS_DIR/editor-opengl-release"
+    zip -r "$RELEASE_DIR/zed-opengl.zip" -9 zed
+    cd - > /dev/null
+
 fi
 
 # Generate checksums for existing files in release folder
