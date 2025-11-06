@@ -17,7 +17,6 @@ if [ -f "$ARTIFACTS_DIR/cli-release/cli.exe" ]; then
 
     cd "$ARTIFACTS_DIR/cli-release"
     mv cli.exe zed.exe
-    file zed.exe
     cd - > /dev/null
 fi
 
@@ -43,9 +42,6 @@ if [ -f "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" ]; then
     zip -r "$RELEASE_DIR/zed-opengl.zip" -9 "$ARTIFACTS_DIR/editor-opengl-release/zed/"
 
 fi
-
-echo "Tree RELEASE_DIR"
-tree "$RELEASE_DIR"
 
 # Generate checksums for existing files in release folder
 cd "$RELEASE_DIR"
