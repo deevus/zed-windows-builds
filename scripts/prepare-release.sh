@@ -17,6 +17,7 @@ if [ -f "$ARTIFACTS_DIR/cli-release/cli.exe" ]; then
 
     cd "$ARTIFACTS_DIR/cli-release"
     mv cli.exe zed.exe
+    file zed.exe
     cd - > /dev/null
 fi
 
