@@ -28,7 +28,7 @@ if [ -f "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" ]; then
     mv "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed/bin"
 
-    ls -al zed
+    ls -al
 
     cd "$ARTIFACTS_DIR/editor-dx11-release"
     zip -r "$RELEASE_DIR/zed.zip" -9 zed
