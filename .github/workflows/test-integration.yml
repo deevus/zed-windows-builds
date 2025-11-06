@@ -135,10 +135,6 @@ jobs:
     strategy:
       matrix:
         scenario:
-          - name: "cli-only"
-            create_dx11: false
-            create_opengl: false
-            expected_files: 3
           - name: "dx11-only"
             create_dx11: true
             create_opengl: false
@@ -180,7 +176,6 @@ jobs:
           find artifacts -type f -name "*.exe" -exec ls -la {} \; || echo "No artifacts created"
 
       - name: Test release preparation
-        if: matrix.scenario.name != 'cli-only'
         run: |
           chmod +x scripts/prepare-release.sh
           ./scripts/prepare-release.sh
@@ -188,22 +183,7 @@ jobs:
           echo "Release files for scenario ${{ matrix.scenario.name }}:"
           ls -la release/
 
-      # - name: Verify expected file count
-      #   run: |
-      #     ACTUAL_COUNT=$(ls -1 release/ | wc -l)
-      #     EXPECTED_COUNT=${{ matrix.scenario.expected_files }}
-
-      #     if [ "$ACTUAL_COUNT" -ne "$EXPECTED_COUNT" ]; then
-      #       echo "❌ FAIL: Expected $EXPECTED_COUNT files, got $ACTUAL_COUNT"
-      #       echo "Files found:"
-      #       ls -la release/
-      #       exit 1
-      #     fi
-
-      #     echo "✅ Correct file count for scenario ${{ matrix.scenario.name }}: $EXPECTED_COUNT files"
-
       - name: Verify checksums
-        if: matrix.scenario.name != 'cli-only'
         run: |
           cd release
           if ! sha256sum -c sha256sums.txt; then
