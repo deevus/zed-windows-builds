@@ -40,7 +40,11 @@ if [ -f "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" ]; then
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
 
     zip -r "$RELEASE_DIR/zed-opengl.zip" -9 "$ARTIFACTS_DIR/editor-opengl-release/zed/"
+
 fi
+
+echo "Tree RELEASE_DIR"
+tree "$RELEASE_DIR"
 
 # Generate checksums for existing files in release folder
 cd "$RELEASE_DIR"
