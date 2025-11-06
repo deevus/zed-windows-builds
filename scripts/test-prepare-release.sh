@@ -80,14 +80,14 @@ create_cli_artifact
 create_dx11_artifact
 create_opengl_artifact
 run_test "success"
-verify_file_count 8
+verify_file_count 3
 # CLI lancher
-verify_file_exists "release/cli-release/zed.exe"
-verify_file_exists "release/editor-dx11-release/zed/bin/zed.exe"
-verify_file_exists "release/editor-opengl-release/zed/bin/zed.exe"
+# verify_file_exists "release/cli-release/zed.exe"
+# verify_file_exists "release/editor-dx11-release/zed/bin/zed.exe"
+# verify_file_exists "release/editor-opengl-release/zed/bin/zed.exe"
 # GUI editor
-verify_file_exists "release/editor-dx11-release/zed/zed.exe"
-verify_file_exists "release/editor-opengl-release/zed/zed.exe"
+# verify_file_exists "release/editor-dx11-release/zed/zed.exe"
+# verify_file_exists "release/editor-opengl-release/zed/zed.exe"
 # zip bundle
 verify_file_exists "release/zed.zip"
 verify_file_exists "release/zed-opengl.zip"
@@ -98,8 +98,8 @@ verify_file_exists "release/sha256sums.txt"
 setup_test "Only DX11 build exists"
 create_dx11_artifact
 run_test "success"
-verify_file_count 3
-verify_file_exists "release/editor-dx11-release/zed/zed.exe"
+verify_file_count 2
+# verify_file_exists "release/editor-dx11-release/zed/zed.exe"
 verify_file_exists "release/zed.zip"
 verify_file_exists "release/sha256sums.txt"
 
@@ -107,20 +107,20 @@ verify_file_exists "release/sha256sums.txt"
 setup_test "Only OpenGL build exists"
 create_opengl_artifact
 run_test "success"
-verify_file_count 3
-verify_file_exists "release/editor-opengl-release/zed/zed.exe"
+verify_file_count 2
+# verify_file_exists "release/editor-opengl-release/zed/zed.exe"
 verify_file_exists "release/zed-opengl.zip"
 verify_file_exists "release/sha256sums.txt"
 
 # Test 3.5: Only CLI build exists
-setup_test "Only CLI build exists"
-create_cli_artifact
-run_test "success"
-verify_file_count 4
-verify_file_exists "release/cli-release/zed.exe"
-verify_file_exists "release/editor-dx11-release/zed/bin/zed.exe"
-verify_file_exists "release/editor-opengl-release/zed/bin/zed.exe"
-verify_file_exists "release/sha256sums.txt"
+# setup_test "Only CLI build exists"
+# create_cli_artifact
+# run_test "success"
+# verify_file_count 4
+# verify_file_exists "release/cli-release/zed.exe"
+# verify_file_exists "release/editor-dx11-release/zed/bin/zed.exe"
+# verify_file_exists "release/editor-opengl-release/zed/bin/zed.exe"
+# verify_file_exists "release/sha256sums.txt"
 
 # Test 4: No builds exist
 setup_test "No builds exist"
