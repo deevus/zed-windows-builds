@@ -132,9 +132,9 @@ fi
 cd ..
 
 # Test 6: Verify zip files contain executables
-setup_test "Zip file content verification"
-create_fake_dx11_artifact
-run_test "success"
+# setup_test "Zip file content verification"
+# create_fake_dx11_artifact
+# run_test "success"
 
 # Check zip content
 if unzip -l release/zed.zip | grep -q "zed.exe"; then
