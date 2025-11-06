@@ -185,8 +185,8 @@ jobs:
 
       - name: Verify expected file count
         run: |
-          EXPECTED_COUNT=${{ matrix.scenario.expected_files }}
           ACTUAL_COUNT=$(ls -1 release/ | wc -l)
+          EXPECTED_COUNT=${{ matrix.scenario.expected_files }}
 
           if [ "$ACTUAL_COUNT" -ne "$EXPECTED_COUNT" ]; then
             echo "❌ FAIL: Expected $EXPECTED_COUNT files, got $ACTUAL_COUNT"
