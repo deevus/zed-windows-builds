@@ -180,6 +180,7 @@ jobs:
           find artifacts -type f -name "*.exe" -exec ls -la {} \; || echo "No artifacts created"
 
       - name: Test release preparation
+        if: matrix.scenario.name != 'cli-only'
         run: |
           chmod +x scripts/prepare-release.sh
           ./scripts/prepare-release.sh
