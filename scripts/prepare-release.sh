@@ -28,6 +28,8 @@ if [ -f "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" ]; then
     mv "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed/bin"
 
+    ls -al zed
+
     cd "$ARTIFACTS_DIR/editor-dx11-release"
     zip -r "$RELEASE_DIR/zed.zip" -9 zed
     cd - > /dev/null
@@ -40,6 +42,8 @@ if [ -f "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" ]; then
     mkdir -p "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
     mv "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
+
+    ls -al zed
 
     cd "$ARTIFACTS_DIR/editor-opengl-release"
     zip -r "$RELEASE_DIR/zed-opengl.zip" -9 zed
