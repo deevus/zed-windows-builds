@@ -107,27 +107,27 @@ jobs:
           echo "Release files after artifact download:"
           ls -la release/
 
-      # - name: Verify release files
-      #   run: |
-      #     # Check that all expected files exist
-      #     EXPECTED_FILES=("zed.zip" "zed-opengl.zip" "sha256sums.txt")
+      - name: Verify release files
+        run: |
+          # Check that all expected files exist
+          EXPECTED_FILES=("zed.zip" "zed-opengl.zip" "sha256sums.txt")
 
-      #     for file in "${EXPECTED_FILES[@]}"; do
-      #       if [ ! -f "release/$file" ]; then
-      #         echo "❌ FAIL: Missing expected file: $file"
-      #         exit 1
-      #       fi
-      #       echo "✅ Found: $file"
-      #     done
+          for file in "${EXPECTED_FILES[@]}"; do
+            if [ ! -f "release/$file" ]; then
+              echo "❌ FAIL: Missing expected file: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
 
-      #     # Verify checksums
-      #     cd release
-      #     if ! sha256sum -c sha256sums.txt; then
-      #       echo "❌ FAIL: Checksum verification failed"
-      #       exit 1
-      #     fi
+          # Verify checksums
+          cd release
+          if ! sha256sum -c sha256sums.txt; then
+            echo "❌ FAIL: Checksum verification failed"
+            exit 1
+          fi
 
-      #     echo "✅ All checksums verified successfully"
+          echo "✅ All checksums verified successfully"
 
   test-partial-failure-scenarios:
     runs-on: ubuntu-latest
@@ -138,15 +138,12 @@ jobs:
           - name: "dx11-only"
             create_dx11: true
             create_opengl: false
-            expected_files: 5
           - name: "opengl-only"
             create_dx11: false
             create_opengl: true
-            expected_files: 5
           - name: "both-builds"
             create_dx11: true
             create_opengl: true
-            expected_files: 7
 
     steps:
       - name: Checkout repository
