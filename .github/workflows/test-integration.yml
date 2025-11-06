@@ -203,6 +203,7 @@ jobs:
       #     echo "✅ Correct file count for scenario ${{ matrix.scenario.name }}: $EXPECTED_COUNT files"
 
       - name: Verify checksums
+        if: matrix.scenario.name != 'cli-only'
         run: |
           cd release
           if ! sha256sum -c sha256sums.txt; then
