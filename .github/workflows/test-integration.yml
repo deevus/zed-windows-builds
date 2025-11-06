@@ -138,12 +138,15 @@ jobs:
           - name: "dx11-only"
             create_dx11: true
             create_opengl: false
+            expected_files: 2
           - name: "opengl-only"
             create_dx11: false
             create_opengl: true
+            expected_files: 2
           - name: "both-builds"
             create_dx11: true
             create_opengl: true
+            expected_files: 3
 
     steps:
       - name: Checkout repository
@@ -179,6 +182,20 @@ jobs:
 
           echo "Release files for scenario ${{ matrix.scenario.name }}:"
           ls -la release/
+
+      - name: Verify expected file count
+        run: |
+          EXPECTED_COUNT=${{ matrix.scenario.expected_files }}
+          ACTUAL_COUNT=$(ls -1 release/ | wc -l)
+
+          if [ "$ACTUAL_COUNT" -ne "$EXPECTED_COUNT" ]; then
+            echo "❌ FAIL: Expected $EXPECTED_COUNT files, got $ACTUAL_COUNT"
+            echo "Files found:"
+            ls -la release/
+            exit 1
+          fi
+
+          echo "✅ Correct file count for scenario ${{ matrix.scenario.name }}: $EXPECTED_COUNT files"
 
       - name: Verify checksums
         run: |
