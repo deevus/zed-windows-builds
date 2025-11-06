@@ -131,13 +131,16 @@ else
 fi
 cd ..
 
-# Test 6: Verify zip files contain executables
-# setup_test "Zip file content verification"
-# create_fake_dx11_artifact
-# run_test "success"
-
-# Check zip content
+# Check `zed.zip` content
 if unzip -l release/zed.zip | grep -q "zed.exe"; then
+    echo "✅ Zip file contains executable"
+else
+    echo "❌ FAIL: Zip file does not contain executable"
+    exit 1
+fi
+
+# Check `zed-opengl.zip` content
+if unzip -l release/zed-opengl.zip | grep -q "zed.exe"; then
     echo "✅ Zip file contains executable"
 else
     echo "❌ FAIL: Zip file does not contain executable"
