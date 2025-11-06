@@ -20,7 +20,7 @@ setup_test() {
     mkdir -p artifacts
 }
 
-create_dx11_artifact() {
+create_fake_dx11_artifact() {
     mkdir -p artifacts/editor-dx11-release
     echo "fake dx11 executable" > artifacts/editor-dx11-release/zed.exe
 }
@@ -74,10 +74,10 @@ run_test() {
     fi
 }
 
-# Test 1: All three builds exist (CLI + DX11 + OpenGL)
+# Test 1: All three builds exist (DX11 + OpenGL)
 setup_test "All three builds exist"
 create_fake_cli_artifact
-create_dx11_artifact
+create_fake_dx11_artifact
 create_fake_opengl_artifact
 run_test "success"
 verify_file_count 3
@@ -88,7 +88,7 @@ verify_file_exists "release/sha256sums.txt"
 # Test 2: Only DX11 build exists
 setup_test "Only DX11 build exists"
 create_fake_cli_artifact
-create_dx11_artifact
+create_fake_dx11_artifact
 run_test "success"
 verify_file_count 2
 verify_file_exists "release/zed.zip"
@@ -117,7 +117,7 @@ echo "✅ No release files created when no builds exist"
 # Test 5: Verify checksums are correct
 setup_test "Checksum verification"
 create_fake_cli_artifact
-create_dx11_artifact
+create_fake_dx11_artifact
 create_fake_opengl_artifact
 run_test "success"
 
@@ -133,7 +133,7 @@ cd ..
 
 # Test 6: Verify zip files contain executables
 setup_test "Zip file content verification"
-create_dx11_artifact
+create_fake_dx11_artifact
 run_test "success"
 
 # Check zip content
