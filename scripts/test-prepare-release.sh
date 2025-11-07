@@ -131,19 +131,35 @@ else
 fi
 cd ..
 
-# Check `zed.zip` content
-if unzip -l release/zed.zip | grep -q "zed.exe"; then
-    echo "✅ Zip file contains executable"
+# Check GUI editor in `zed.zip`
+echo "Checking `zed.zip` structure"
+if unzip -l release/zed.zip | grep -q "^.*zed/zed.exe$" ;then
+    echo "✅ GUI editor is in the correct location"
 else
-    echo "❌ FAIL: Zip file does not contain executable"
+    echo "❌ GUI editor missing or in wrong location"
+    exit 1
+fi
+# Check CLI lancher in `zed.zip`
+if unzip -l release/zed.zip | grep -q "^.*zed/bin/zed.exe$"; then
+    echo "✅ CLI lancher is in the correct location"
+else
+    echo "❌ CLI lancher missing or in wrong location"
     exit 1
 fi
 
-# Check `zed-opengl.zip` content
-if unzip -l release/zed-opengl.zip | grep -q "zed.exe"; then
-    echo "✅ Zip file contains executable"
+# Check GUI editor in `zed-opengl.zip`
+echo "Checking `zed-opengl.zip` structure"
+if unzip -l release/zed-opengl.zip | grep -q "^.*zed/zed.exe$"; then
+    echo "✅ GUI editor is in the correct location"
 else
-    echo "❌ FAIL: Zip file does not contain executable"
+    echo "❌ GUI editor missing or in wrong location"
+    exit 1
+fi
+# Check CLI lancher in `zed-opengl.zip`
+if unzip -l release/zed-opengl.zip | grep -q "^.*zed/bin/zed.exe$"; then
+    echo "✅ CLI lancher is in the correct location"
+else
+    echo "❌ CLI lancher missing or in wrong location"
     exit 1
 fi
 
