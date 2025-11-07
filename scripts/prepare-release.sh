@@ -25,7 +25,9 @@ if [ -f "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" ]; then
     mv "$ARTIFACTS_DIR/editor-dx11-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-dx11-release/zed/bin"
 
-    zip -r "$RELEASE_DIR/zed.zip" -9 "$ARTIFACTS_DIR/editor-dx11-release/zed/"
+    cd "$ARTIFACTS_DIR/editor-dx11-release"
+    zip -r "../../$RELEASE_DIR/zed.zip" -9 "zed/"
+    cd -
 fi
 
 # Check if OpenGL build exists
@@ -36,7 +38,9 @@ if [ -f "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" ]; then
     mv "$ARTIFACTS_DIR/editor-opengl-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed"
     cp "$ARTIFACTS_DIR/cli-release/zed.exe" "$ARTIFACTS_DIR/editor-opengl-release/zed/bin"
 
-    zip -r "$RELEASE_DIR/zed-opengl.zip" -9 "$ARTIFACTS_DIR/editor-opengl-release/zed/"
+    cd "$ARTIFACTS_DIR/editor-opengl-release"
+    zip -r "../../$RELEASE_DIR/zed-opengl.zip" -9 "zed/"
+    cd -
 fi
 
 # Generate checksums for existing files in release folder
