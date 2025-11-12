@@ -24,9 +24,9 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
     strategy:
       matrix:
+        os: [windows-11-arm, windows-latest]
         include:
           - name: cli
             build_path: crates/cli
@@ -45,6 +45,7 @@ jobs:
             binary: zed.exe
             rustflags: "--cfg gles"
       fail-fast: false
+    runs-on: {{ matrix.os }}
 
     steps:
       - name: Enable long paths in Git
