@@ -139,11 +139,11 @@ else
     echo "❌ GUI editor missing or in wrong location"
     exit 1
 fi
-# Check CLI lancher in `zed.zip`
+# Check CLI launcher in `zed.zip`
 if unzip -l release/zed.zip | grep -q "^.*zed/bin/zed.exe$"; then
-    echo "✅ CLI lancher is in the correct location"
+    echo "✅ CLI launcher is in the correct location"
 else
-    echo "❌ CLI lancher missing or in wrong location"
+    echo "❌ CLI launcher missing or in wrong location"
     exit 1
 fi
 
@@ -155,11 +155,11 @@ else
     echo "❌ GUI editor missing or in wrong location"
     exit 1
 fi
-# Check CLI lancher in `zed-opengl.zip`
+# Check CLI launcher in `zed-opengl.zip`
 if unzip -l release/zed-opengl.zip | grep -q "^.*zed/bin/zed.exe$"; then
-    echo "✅ CLI lancher is in the correct location"
+    echo "✅ CLI launcher is in the correct location"
 else
-    echo "❌ CLI lancher missing or in wrong location"
+    echo "❌ CLI launcher missing or in wrong location"
     exit 1
 fi
 
