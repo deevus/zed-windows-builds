@@ -110,7 +110,7 @@ jobs:
       - name: Verify release files
         run: |
           # Check that all expected files exist
-          EXPECTED_FILES=("cli.exe" "cli.zip" "zed.exe" "zed.zip" "zed-opengl.exe" "zed-opengl.zip" "sha256sums.txt")
+          EXPECTED_FILES=("zed.zip" "zed-opengl.zip" "sha256sums.txt")
 
           for file in "${EXPECTED_FILES[@]}"; do
             if [ ! -f "release/$file" ]; then
@@ -135,22 +135,18 @@ jobs:
     strategy:
       matrix:
         scenario:
-          - name: "cli-only"
-            create_dx11: false
-            create_opengl: false
-            expected_files: 3
           - name: "dx11-only"
             create_dx11: true
             create_opengl: false
-            expected_files: 5
+            expected_files: 2
           - name: "opengl-only"
             create_dx11: false
             create_opengl: true
-            expected_files: 5
+            expected_files: 2
           - name: "both-builds"
             create_dx11: true
             create_opengl: true
-            expected_files: 7
+            expected_files: 3
 
     steps:
       - name: Checkout repository

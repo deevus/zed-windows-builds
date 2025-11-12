@@ -52,32 +52,10 @@ jobs:
           # Run the script
           ./scripts/prepare-release.sh
 
-          # Verify outputs
-          if [ ! -f "release/cli.exe" ]; then
-            echo "❌ FAIL: Missing cli.exe"
-            exit 1
-          fi
-
-          if [ ! -f "release/cli.zip" ]; then
-            echo "❌ FAIL: Missing cli.zip"
-            exit 1
-          fi
-
-          if [ ! -f "release/zed.exe" ]; then
-            echo "❌ FAIL: Missing zed.exe"
-            exit 1
-          fi
-
           if [ ! -f "release/zed.zip" ]; then
             echo "❌ FAIL: Missing zed.zip"
             exit 1
           fi
-
-          if [ ! -f "release/zed-opengl.exe" ]; then
-            echo "❌ FAIL: Missing zed-opengl.exe"
-            exit 1
-          fi
-
 
           if [ ! -f "release/zed-opengl.zip" ]; then
             echo "❌ FAIL: Missing zed-opengl.zip"

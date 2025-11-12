@@ -20,17 +20,17 @@ setup_test() {
     mkdir -p artifacts
 }
 
-create_dx11_artifact() {
+create_fake_dx11_artifact() {
     mkdir -p artifacts/editor-dx11-release
     echo "fake dx11 executable" > artifacts/editor-dx11-release/zed.exe
 }
 
-create_opengl_artifact() {
+create_fake_opengl_artifact() {
     mkdir -p artifacts/editor-opengl-release
     echo "fake opengl executable" > artifacts/editor-opengl-release/zed.exe
 }
 
-create_cli_artifact() {
+create_fake_cli_artifact() {
     mkdir -p artifacts/cli-release
     echo "fake cli executable" > artifacts/cli-release/cli.exe
 }
@@ -74,46 +74,33 @@ run_test() {
     fi
 }
 
-# Test 1: All three builds exist (CLI + DX11 + OpenGL)
+# Test 1: All three builds exist (DX11 + OpenGL)
 setup_test "All three builds exist"
-create_cli_artifact
-create_dx11_artifact
-create_opengl_artifact
+create_fake_cli_artifact
+create_fake_dx11_artifact
+create_fake_opengl_artifact
 run_test "success"
-verify_file_count 7  # cli.exe, cli.zip, zed.exe, zed.zip, zed-opengl.exe, zed-opengl.zip, sha256sums.txt
-verify_file_exists "release/cli.exe"
-verify_file_exists "release/cli.zip"
-verify_file_exists "release/zed.exe"
+verify_file_count 3
 verify_file_exists "release/zed.zip"
-verify_file_exists "release/zed-opengl.exe"
 verify_file_exists "release/zed-opengl.zip"
 verify_file_exists "release/sha256sums.txt"
 
 # Test 2: Only DX11 build exists
 setup_test "Only DX11 build exists"
-create_dx11_artifact
+create_fake_cli_artifact
+create_fake_dx11_artifact
 run_test "success"
-verify_file_count 3  # zed.exe, zed.zip, sha256sums.txt
-verify_file_exists "release/zed.exe"
+verify_file_count 2
 verify_file_exists "release/zed.zip"
 verify_file_exists "release/sha256sums.txt"
 
 # Test 3: Only OpenGL build exists
 setup_test "Only OpenGL build exists"
-create_opengl_artifact
+create_fake_cli_artifact
+create_fake_opengl_artifact
 run_test "success"
-verify_file_count 3  # zed-opengl.exe, zed-opengl.zip, sha256sums.txt
-verify_file_exists "release/zed-opengl.exe"
+verify_file_count 2
 verify_file_exists "release/zed-opengl.zip"
-verify_file_exists "release/sha256sums.txt"
-
-# Test 3.5: Only CLI build exists
-setup_test "Only CLI build exists"
-create_cli_artifact
-run_test "success"
-verify_file_count 3  # cli.exe, cli.zip, sha256sums.txt
-verify_file_exists "release/cli.exe"
-verify_file_exists "release/cli.zip"
 verify_file_exists "release/sha256sums.txt"
 
 # Test 4: No builds exist
@@ -129,9 +116,9 @@ echo "✅ No release files created when no builds exist"
 
 # Test 5: Verify checksums are correct
 setup_test "Checksum verification"
-create_cli_artifact
-create_dx11_artifact
-create_opengl_artifact
+create_fake_cli_artifact
+create_fake_dx11_artifact
+create_fake_opengl_artifact
 run_test "success"
 
 # Verify checksums
@@ -144,16 +131,35 @@ else
 fi
 cd ..
 
-# Test 6: Verify zip files contain executables
-setup_test "Zip file content verification"
-create_dx11_artifact
-run_test "success"
-
-# Check zip content
-if unzip -l release/zed.zip | grep -q "zed.exe"; then
-    echo "✅ Zip file contains executable"
+# Check GUI editor in `zed.zip`
+echo "Checking `zed.zip` structure"
+if unzip -l release/zed.zip | grep -q "^.*zed/zed.exe$" ;then
+    echo "✅ GUI editor is in the correct location"
 else
-    echo "❌ FAIL: Zip file does not contain executable"
+    echo "❌ GUI editor missing or in wrong location"
+    exit 1
+fi
+# Check CLI launcher in `zed.zip`
+if unzip -l release/zed.zip | grep -q "^.*zed/bin/zed.exe$"; then
+    echo "✅ CLI launcher is in the correct location"
+else
+    echo "❌ CLI launcher missing or in wrong location"
+    exit 1
+fi
+
+# Check GUI editor in `zed-opengl.zip`
+echo "Checking `zed-opengl.zip` structure"
+if unzip -l release/zed-opengl.zip | grep -q "^.*zed/zed.exe$"; then
+    echo "✅ GUI editor is in the correct location"
+else
+    echo "❌ GUI editor missing or in wrong location"
+    exit 1
+fi
+# Check CLI launcher in `zed-opengl.zip`
+if unzip -l release/zed-opengl.zip | grep -q "^.*zed/bin/zed.exe$"; then
+    echo "✅ CLI launcher is in the correct location"
+else
+    echo "❌ CLI launcher missing or in wrong location"
     exit 1
 fi
 
