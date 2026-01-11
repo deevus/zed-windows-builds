@@ -32,7 +32,7 @@ jobs:
           echo "Building release from $REPO#$SHA: $MSG"
           echo "build_ref=$REF" >> $GITHUB_OUTPUT
           echo "build_repo=$REPO" >> $GITHUB_OUTPUT
-          echo "release_tag=$(date +'%m-%d-%Y')" >> $GITHUB_OUTPUT
+          echo "release_tag=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
           echo "release_body=Built from $REPO commit [$SHA]($URL): $MSG" >> $GITHUB_OUTPUT
 
   trigger_build:
