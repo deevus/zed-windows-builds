@@ -32,6 +32,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ needs.check_stable_releases.outputs.build_ref }}
+      build_dx11: false
 
   trigger_release:
     name: Release

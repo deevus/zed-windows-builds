@@ -11,6 +11,18 @@ on:
         description: Branch/tag/ref to build
         type: string
         required: true
+      build_cli:
+        description: Build the CLI (zed.exe launcher)
+        type: boolean
+        default: true
+      build_dx11:
+        description: Build the Vulkan/DX11 editor variant
+        type: boolean
+        default: true
+      build_opengl:
+        description: Build the OpenGL editor variant
+        type: boolean
+        default: true
   workflow_dispatch:
     inputs:
       repository:
@@ -21,10 +33,23 @@ on:
         description: Branch/tag/ref to build
         type: string
         default: main
+      build_cli:
+        description: Build the CLI (zed.exe launcher)
+        type: boolean
+        default: true
+      build_dx11:
+        description: Build the Vulkan/DX11 editor variant
+        type: boolean
+        default: true
+      build_opengl:
+        description: Build the OpenGL editor variant
+        type: boolean
+        default: true
 
 jobs:
   build:
     runs-on: windows-latest
+    if: ${{ (matrix.name == 'cli' && inputs.build_cli) || (matrix.name == 'editor-dx11' && inputs.build_dx11) || (matrix.name == 'editor-opengl' && inputs.build_opengl) }}
     timeout-minutes: 180
     env:
       CARGO_INCREMENTAL: 0

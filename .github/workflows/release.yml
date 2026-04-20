@@ -37,21 +37,6 @@ jobs:
           echo "Downloaded artifacts:"
           find artifacts -type f -name "*.exe" -exec ls -la {} \;
 
-          # Check if CLI build exists
-          if [ ! -f "artifacts/cli-release/cli.exe" ]; then
-            echo "❌ FAIL: CLI artifact not found"
-          fi
-
-          # Check if DX11 build exists
-          if [ ! -f "artifacts/editor-dx11-release/zed.exe" ]; then
-            echo "❌ FAIL: DX11 artifact not found"
-          fi
-
-          # Check if OpenGL build exists
-          if [ ! -f "artifacts/editor-opengl-release/zed.exe" ]; then
-            echo "❌ FAIL: OpenGL artifact not found"
-          fi
-
       - name: Create release directories and zip
         run: |
           chmod +x scripts/prepare-release.sh
