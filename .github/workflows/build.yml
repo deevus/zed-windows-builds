@@ -25,6 +25,9 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 180
+    env:
+      CARGO_INCREMENTAL: 0
     strategy:
       matrix:
         include:
@@ -55,6 +58,19 @@ jobs:
         run: |
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
             -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
+      - name: Exclude build paths from Windows Defender
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'SilentlyContinue'
+          Add-MpPreference -ExclusionPath "$env:USERPROFILE\.cargo"
+          Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE"
+          Add-MpPreference -ExclusionPath "$env:TEMP"
+          Add-MpPreference -ExclusionProcess "cargo.exe"
+          Add-MpPreference -ExclusionProcess "rustc.exe"
+          Add-MpPreference -ExclusionProcess "link.exe"
+          Add-MpPreference -ExclusionProcess "lld-link.exe"
+          exit 0
 
       - name: Checkout self
         uses: actions/checkout@v4
