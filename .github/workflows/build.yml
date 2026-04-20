@@ -137,7 +137,7 @@ jobs:
         if: steps.guard.outputs.should_build == 'true'
         uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.name }}-${{ hashFiles('**/Cargo.lock') }}
+          shared-key: ${{ matrix.name }}
           workspaces: "zed -> target"
 
       - name: Install PSToml module
