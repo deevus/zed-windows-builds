@@ -3,6 +3,3 @@ rustflags = []
 [profile.release]
 debug = false
 strip = true
-codegen-units = 1
-lto = true
-panic = "abort"
