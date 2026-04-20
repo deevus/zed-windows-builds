@@ -49,7 +49,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    if: ${{ (matrix.name == 'cli' && inputs.build_cli) || (matrix.name == 'editor-dx11' && inputs.build_dx11) || (matrix.name == 'editor-opengl' && inputs.build_opengl) }}
     timeout-minutes: 180
     env:
       CARGO_INCREMENTAL: 0
@@ -75,16 +74,34 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Determine if this variant should build
+        id: guard
+        shell: bash
+        run: |
+          case "${{ matrix.name }}" in
+            cli) v='${{ inputs.build_cli }}' ;;
+            editor-dx11) v='${{ inputs.build_dx11 }}' ;;
+            editor-opengl) v='${{ inputs.build_opengl }}' ;;
+            *) v='true' ;;
+          esac
+          echo "should_build=$v" >> "$GITHUB_OUTPUT"
+          if [ "$v" != "true" ]; then
+            echo "Skipping ${{ matrix.name }} build (input set to false)"
+          fi
+
       - name: Enable long paths in Git
+        if: steps.guard.outputs.should_build == 'true'
         run: git config --system core.longpaths true
 
       - name: Enable long paths in Windows
+        if: steps.guard.outputs.should_build == 'true'
         shell: powershell
         run: |
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
             -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
 
       - name: Exclude build paths from Windows Defender
+        if: steps.guard.outputs.should_build == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'SilentlyContinue'
@@ -98,9 +115,11 @@ jobs:
           exit 0
 
       - name: Checkout self
+        if: steps.guard.outputs.should_build == 'true'
         uses: actions/checkout@v4
 
       - name: Checkout Zed
+        if: steps.guard.outputs.should_build == 'true'
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.repository }}
@@ -108,32 +127,38 @@ jobs:
           path: zed
 
       - name: Install rust nightly
+        if: steps.guard.outputs.should_build == 'true'
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
           target: wasm32-wasip1
 
       - name: Rust Cache
+        if: steps.guard.outputs.should_build == 'true'
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.name }}-${{ hashFiles('**/Cargo.lock') }}
           workspaces: "zed -> target"
 
       - name: Install PSToml module
+        if: steps.guard.outputs.should_build == 'true'
         shell: pwsh
         run: Install-Module -Name PSToml -Scope CurrentUser -Force
 
       - name: Setup rustflags
+        if: steps.guard.outputs.should_build == 'true'
         shell: pwsh
         run: ./scripts/Parse-Rustflags.ps1 ${{ matrix.rustflags }}
 
       - name: Build ${{ matrix.name }}
+        if: steps.guard.outputs.should_build == 'true'
         working-directory: zed/${{ matrix.build_path }}
         env:
           ZED_UPDATE_EXPLANATION: "Please use Scoop to update Zed."
         run: cargo b -r
 
       - name: Upload ${{ matrix.name }}
+        if: steps.guard.outputs.should_build == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
