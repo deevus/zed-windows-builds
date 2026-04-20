@@ -8,7 +8,12 @@
 > [!NOTE]
 > **Official Windows builds are now available!** Download Zed for Windows from the official website: https://zed.dev/download
 >
-> This repository continues to provide unofficial community builds for those who want bleeding-edge nightly builds or prefer to use Scoop package manager.
+> This repository continues to provide unofficial community builds for:
+>
+> - **OpenGL stable builds** — for systems where Vulkan/DX11 isn't available (Zed upstream does not ship an OpenGL variant)
+> - **Nightly builds** (Vulkan and OpenGL) — for users who want bleeding-edge commits
+>
+> The Scoop `extras/zed` manifest now pulls stable Vulkan/DX11 builds directly from `zed-industries/zed` upstream — this repo no longer produces stable Vulkan/DX11 builds.
 
 **NOTE: This is not a support channel for Zed on Windows.**
 
@@ -20,7 +25,9 @@ If you have suggestions for improvements to the build process, please start a di
 
 All installation instructions below require that [Scoop](https://scoop.sh/) is installed on your system.
 
-## Stable builds
+## Stable version
+
+Zed's Scoop manifest now uses official upstream binaries from `zed-industries/zed`:
 
 ```pwsh
 scoop bucket add extras
